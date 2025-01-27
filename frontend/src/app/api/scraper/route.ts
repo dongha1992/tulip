@@ -36,7 +36,19 @@ const openBrowser = async () => {
 
   try {
     const page = await browser.newPage();
-
+    await Promise.all([
+      page.setRequestInterception(true),
+      page.setCacheEnabled(true),
+      page.setJavaScriptEnabled(true),
+    ]);
+    page.on('request', (req) => {
+      const resourceType = req.resourceType();
+      if (['image', 'stylesheet', 'font', 'media'].includes(resourceType)) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
     await page.goto(
       'https://tossinvest.com/stocks/US20200827001/community?feedSortType=RECENT',
       {
@@ -46,7 +58,7 @@ const openBrowser = async () => {
     );
 
     await page.waitForSelector('ul[data-list-name="StocksFeed"]', {
-      timeout: 120000,
+      timeout: 60000,
     });
 
     let previousHeight;
@@ -111,14 +123,12 @@ const getHtml = async () => {
 
 export async function POST() {
   const stocksFeed = await getHtml();
-  const { data } = await axios.post('http://127.0.0.1:8000/compare-images', {
-    target_image:
-      'https://tulip-img.s3.ap-northeast-2.amazonaws.com/target.webp',
-    images: (stocksFeed as StockFeed[]).map((feed) => feed.imageSrc),
-  });
+  // const { data } = await axios.post('http://127.0.0.1:8000/compare-images', {
+  //   target_image:
+  //     'https://tulip-img.s3.ap-northeast-2.amazonaws.com/target.webp',
+  //   images: (stocksFeed as StockFeed[]).map((feed) => feed.imageSrc),
+  // });
 
-  console.log(data, 'data');
-  return Response.json({
-    data: data,
-  });
+  // console.log(data, 'data');
+  return Response.json({});
 }
