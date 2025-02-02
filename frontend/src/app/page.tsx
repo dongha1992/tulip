@@ -1,8 +1,9 @@
 'use client';
 
-import styles from './page.module.scss';
+import styles from '@/app/styles/page.module.scss';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Input } from '@/app/components/Input';
 
 export default function Home() {
   useEffect(() => {
@@ -22,7 +23,15 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.page}>ass</div>
+      <div className={styles.page}>
+        <Input>
+          <Input.TextField
+            type="text"
+            defaultValue={''}
+            // ref={passwordConfirmRef}
+          />
+        </Input>
+      </div>
     </div>
   );
 }
