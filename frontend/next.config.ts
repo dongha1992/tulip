@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import path from 'path';
 
 const nextConfig = {
   webpack: (config, { isServer }) => {
@@ -16,6 +17,9 @@ const nextConfig = {
     });
     config.externals.push({ sharp: 'commonjs sharp' });
     return config;
+  },
+  sassOptions: {
+    includePaths: [path.join(__dirname, 'styles')],
   },
 };
 

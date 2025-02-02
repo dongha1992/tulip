@@ -7,7 +7,7 @@ async def get_stock_feeds(max_scrolls: int = 5) -> List[Dict]:
         browser = await p.chromium.launch(headless=True)
         try:
             page = await browser.new_page()
-            await page.goto('https://tossinvest.com/stocks/US20200827001/community?feedSortType=RECENT', wait_until='domcontentloaded', timeout=60000)
+            await page.goto('https://tossinvest.com/stocks/NAS0221213008/community?feedSortType=RECENT', wait_until='domcontentloaded', timeout=60000)
 
             stock_feeds = []
             feed_hrefs = set()

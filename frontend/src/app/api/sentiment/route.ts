@@ -1,19 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pipeline } from '@xenova/transformers';
 import axios from 'axios';
-
-let model = null;
 
 export async function GET(req: NextRequest) {
   try {
-    // Python API 호출
     const response = await axios.post('http://127.0.0.1:8000/scrape');
     const { feeds: stockFeeds } = response.data;
 
-    console.log(stockFeeds, 'stockFeeds');
-    // 감정 분석 수행
     const texts = stockFeeds.map((feed) => feed.text).filter(Boolean);
-    const koreanResults = await Promise.all(texts.map(analyzeKoreanSentiment));
+
+    const sentimentResponse = await axios.post(
+      'http://127.0.0.1:8000/analyze',
+      {
+        texts: texts,
+      },
+    );
+
+    const koreanResults = sentimentResponse.data.map((result) => ({
+      sentiment_score: result.score.toFixed(2),
+      positive_percent: result.score.toFixed(2),
+      negative_percent: (100 - result.score).toFixed(2),
+      detailed_sentiment: result.label,
+      confidence: result.confidence,
+      overall_sentiment: result.label,
+      class_probabilities: result.class_probabilities,
+      sentiment_strength: getSentimentStrength(result.score),
+    }));
 
     const sentimentResults = texts.map((text, index) => ({
       text,
@@ -40,64 +51,13 @@ export async function GET(req: NextRequest) {
   }
 }
 
-async function analyzeKoreanSentiment(text) {
-  if (!model) {
-    model = await pipeline(
-      'sentiment-analysis',
-      'Xenova/bert-base-multilingual-uncased-sentiment',
-    );
-  }
-
-  try {
-    const result = await model(text);
-    const score = result[0].score;
-    const label = result[0].label;
-
-    return {
-      sentiment_score: score.toFixed(4),
-      positive_percent: (score * 100).toFixed(2),
-      negative_percent: ((1 - score) * 100).toFixed(2),
-      detailed_sentiment: getDetailedSentiment(score),
-      confidence: getConfidenceLevel(score),
-      overall_sentiment: interpretLabel(label),
-    };
-  } catch (e) {
-    console.error(`Error in analyzeKoreanSentiment: ${e.message}`);
-    return {
-      sentiment_score: '0.5000',
-      positive_percent: '50.00',
-      negative_percent: '50.00',
-      detailed_sentiment: '중립',
-      confidence: '낮음',
-      overall_sentiment: '중립',
-    };
-  }
-}
-
-function getDetailedSentiment(score) {
-  if (score < 0.2) return '매우 부정';
-  if (score < 0.4) return '다소 부정';
-  if (score < 0.6) return '중립';
-  if (score < 0.8) return '다소 긍정';
-  return '매우 긍정';
-}
-
-function getConfidenceLevel(score) {
-  const confidence = Math.abs(score - 0.5) * 2;
-  if (confidence < 0.33) return '낮음';
-  if (confidence < 0.66) return '중간';
-  return '높음';
-}
-
-function interpretLabel(label) {
-  const labelMap = {
-    '1 star': '매우 부정',
-    '2 stars': '부정',
-    '3 stars': '중립',
-    '4 stars': '긍정',
-    '5 stars': '매우 긍정',
-  };
-  return labelMap[label] || '중립';
+// 감정 강도를 판단하는 함수 추가
+function getSentimentStrength(score: number): string {
+  if (score >= 75) return '매우 강함';
+  if (score >= 55) return '강함';
+  if (score > 45) return '보통';
+  if (score >= 25) return '약함';
+  return '매우 약함';
 }
 
 function determineOverallSentiment(results) {
@@ -111,6 +71,7 @@ function determineOverallSentiment(results) {
     ([sentiment, count]) => ({
       sentiment,
       percentage: ((count / totalCount) * 100).toFixed(2),
+      count,
     }),
   );
 
@@ -128,8 +89,10 @@ function determineOverallSentiment(results) {
 
   return {
     dominant_sentiment: dominantSentiment.sentiment,
-    average_score: averageScore.toFixed(4),
+    average_score: averageScore.toFixed(2),
     sentiment_distribution: sentimentPercentages,
-    overall_confidence: getConfidenceLevel(averageScore),
+    overall_confidence: results[0].confidence,
+    sentiment_strength: getSentimentStrength(averageScore),
+    total_analyzed: totalCount,
   };
 }

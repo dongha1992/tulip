@@ -1,0 +1,48 @@
+@import "../../../styles/sass/colors";
+@import "../../../styles/sass/font-size";
+
+.input_container__label {
+  display: inline-block;
+  @extend .typography-t6;
+  @extend .font-weight--medium;
+  color: $gray700;
+  padding: 5px 0;
+}
+
+.input_container__bottom-text {
+  display: inline-block;
+  @extend .typography-t6;
+  @extend .font-weight--regular;
+  margin-top: 4px;
+  color: $gray600;
+
+  &--error {
+    color: $red600;
+  }
+}
+
+.input_field {
+  @extend .typography-t6;
+  width: 100%;
+  padding: 0 12px;
+  margin: 0;
+  outline: none;
+  border: none;
+  border-radius: 8px;
+  background-color: $white;
+  line-height: 40px;
+  transition: background 0.2s ease, color 0.1s ease, box-shadow 0.2s ease;
+  box-shadow: inset 0 0 0 1px $grayOpacity200;
+
+  &:focus {
+    box-shadow: inset 0 0 0 2px $blue500;
+  }
+
+  &--error {
+    box-shadow: inset 0 0 0 1px $red600;
+
+    &:focus {
+      box-shadow: inset 0 0 0 2px $red600;
+    }
+  }
+}

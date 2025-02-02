@@ -5,7 +5,8 @@ from image_similarity import find_similar_images
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 from crawler import get_stock_feeds
-# from sentiment_analysis import analyze_korean_sentiment, KoreanSentimentAnalyzer
+from sentiment_analysis import SentimentAnalyzer
+
 import asyncio
 import requests
 
@@ -59,39 +60,11 @@ async def scrape():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# @app.get("/analyze-sentiment")
-# async def analyze_sentiment():
-#     try:
-#         stock_feeds = await get_stock_feeds()
-#         texts = [feed.get("text", "") for feed in stock_feeds if feed.get("text")]
-#
-#         korean_results = [analyze_korean_sentiment(text) for text in texts]
-#         vader_results = [analyze_sentiment(text) for text in texts]
-#
-#         korean_overall = determine_overall_sentiment(korean_results)
-#         vader_overall = determine_overall_sentiment(vader_results)
-#
-#         sentiment_results = [
-#             {
-#                 "text": text,
-#                 "korean_sentiment": korean,
-#                 "vader_sentiment": vader
-#             }
-#             for text, korean, vader in zip(texts, korean_results, vader_results)
-#         ]
-#
-#         return {
-#             "status": "success",
-#             "data": {
-#                 "individual_results": sentiment_results,
-#                 "overall_sentiment": {
-#                     "korean": korean_overall,
-#                     "vader": vader_overall
-#                 }
-#             }
-#         }
-#          return {
-#
-#          }
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
+class SentimentRequest(BaseModel):
+    texts: List[str]
+
+analyzer = SentimentAnalyzer()
+
+@app.post("/analyze")
+async def analyze_sentiment(request: SentimentRequest):
+    return [analyzer.analyze_text(text) for text in request.texts]
