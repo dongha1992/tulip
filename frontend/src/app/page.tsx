@@ -1,37 +1,29 @@
-'use client';
+import { SearchParams } from "nuqs/server";
 
-import styles from '@/app/styles/page.module.scss';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Input } from '@/app/components/Input';
+type HomePageProps = {
+  searchParams: Promise<SearchParams>;
+};
 
-export default function Home() {
-  useEffect(() => {
-    const getScraper = async () => {
-      const data = await axios.post('http://127.0.0.1:8000/scrape');
-      console.log(data);
-    };
 
-    const getSentiment = async () => {
-      const data = await axios.get('/api/sentiment');
-      console.log(data);
-    };
+export default function Home({ searchParams }: HomePageProps) {
+  // useEffect(() => {
+  //   const getScraper = async () => {
+  //     const data = await axios.post('http://127.0.0.1:8000/scrape');
+  //     console.log(data);      
+  //   };
 
-    // getScraper();
-    getSentiment();
-  }, []);
+  //   const getSentiment = async () => {
+  //     const data = await axios.get('/api/sentiment');
+  //     console.log(data);
+  //   };
+
+  //   getScraper();
+  //   getSentiment();
+  // }, []);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.page}>
-        <Input>
-          <Input.TextField
-            type="text"
-            defaultValue={''}
-            // ref={passwordConfirmRef}
-          />
-        </Input>
-      </div>
+    <div>
+      <h1>Home</h1>
     </div>
   );
 }
