@@ -22,8 +22,8 @@ export default function Home({ searchParams }: HomePageProps) {
   // }, []);
 
   return (
-    <div>
-      <h1>Home</h1>
-    </div>
+    <div className="">
+      홈
+   </div>
   );
 }

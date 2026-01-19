@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Header } from "./_navigation/header";
+import { Sidebar } from "./_navigation/sidebar/components/sidebar";
 import "./global.css";
 
 const geistSans = localFont({
@@ -32,7 +34,14 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <NuqsAdapter>
-          {children}  
+          <Header />
+          <div className="flex h-screen">
+            <Sidebar />
+            <main className="flex flex-1 min-h-screen flex-col py-24 px-8 bg-secondary/20">
+              {children}  
+            </main>
+          </div>
+          
         </NuqsAdapter>
       </body>
     </html>
