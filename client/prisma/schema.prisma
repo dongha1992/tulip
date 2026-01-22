@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+
+model User {
+  id                      String                   @id @default(cuid())
+  username                String                   @unique
+  email                   String                   @unique
+  passwordHash            String
+  sessions                Session[]
+  passwordResetTokens     PasswordResetToken[]
+  tradings                 Trading[]
+  comments                Comment[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  userId    String
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  tokenHash String   @unique
+  expiresAt DateTime
+  userId    String
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Trading {
+  id                 String       @id @default(cuid())
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  title              String
+  content            String       @db.VarChar(1024)
+  status             TradingStatus @default(OPEN)
+  deadline           String
+  buy                Int
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String
+  comments           Comment[]
+  attachments        Attachment[]
+  referencedTradings  Trading[]     @relation("TradingReferences")
+  referencingTradings Trading[]     @relation("TradingReferences")
+
+  @@index([userId])
+}
+
+model Comment {
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  content     String       @db.VarChar(1024)
+  trading     Trading       @relation(fields: [tradingId], references: [id], onDelete: Cascade)
+  tradingId   String
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId      String?
+  attachments Attachment[]
+
+  @@index([tradingId])
+  @@index([userId])
+}
+
+
+enum AttachmentEntity {
+  TRADING
+  COMMENT
+}
+
+model Attachment {
+  id   String @id @default(cuid())
+  name String
+
+  entity    AttachmentEntity
+  trading    Trading?          @relation(fields: [tradingId], references: [id], onDelete: Cascade)
+  tradingId  String?
+  comment   Comment?         @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?
+
+  @@index([tradingId])
+  @@index([commentId])
+}
+
+enum TradingStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+}
