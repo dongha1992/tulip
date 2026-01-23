@@ -1,7 +1,7 @@
 import { Heading } from "@/components/heading";
 import { Spinner } from "@/components/spinner";
-// import { TicketList } from "@/features/ticket/components/ticket-list";
-// import { searchParamsCache } from "@/features/ticket/search-params";
+import { TradingList } from "@/features/trading/components/trading-list";
+import { searchParamsCache } from "@/features/trading/search-params";
 import { SearchParams } from "nuqs/server";
 import { Suspense } from "react";
 
@@ -17,10 +17,10 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
         description="매매를 복기해보자"
       />
 
-      <Suspense fallback={<Spinner />}>
-        {/* <TicketList
+      <Suspense fallback={<Spinner />}> 
+        <TradingList
           searchParams={searchParamsCache.parse(await searchParams)}
-        /> */}
+        />
       </Suspense>
     </div>
   );

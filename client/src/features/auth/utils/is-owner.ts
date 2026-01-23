@@ -1,4 +1,10 @@
-import { User } from "@prisma/client";
+type User = {
+  id: string;
+  username: string;
+  email: string;
+  passwordHash: string;
+};
+
 
 type Entity = {
   userId: string | null;

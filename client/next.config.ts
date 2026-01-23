@@ -10,11 +10,19 @@ const nextConfig: NextConfig = {
         net: false,
         tls: false,
       };
+      // Prisma Client를 클라이언트 번들에서 완전히 제외
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@prisma/client': false,
+      };
     }
     config.externals.push({
       onnxruntime: 'onnxruntime',
       'onnxruntime-node': 'onnxruntime-node',
     });
+    if (!isServer) {
+      config.externals.push('@prisma/client');
+    }
     config.externals.push({ sharp: 'commonjs sharp' });
     return config;
   },

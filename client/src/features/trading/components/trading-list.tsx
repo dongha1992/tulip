@@ -1,12 +1,10 @@
-
 import { Placeholder } from "@/components/placeholder";
-import { SORT_OPTIONS } from "../constants";
 import { getTradings } from "../queries/get-tradings";
 import { ParsedSearchParams } from "../search-params";
 import { TradingItem } from "./trading-item";
 import { TradingPagination } from "./trading-pagination";
 import { TradingSearchInput } from "./trading-search-input";
-import { TradingSortSelect } from "./trading-sort-select";
+import { SORT_OPTIONS, TradingSortSelect } from "./trading-sort-select";
 
 type TradingListProps = {
   userId?: string;
@@ -22,6 +20,7 @@ const TradingList = async ({
         searchParams
     );
     
+    
     return (
         <div className="flex-1 flex flex-col items-center gap-y-4 animate-fade-from-top">
             
@@ -32,7 +31,7 @@ const TradingList = async ({
                 {tradings.length ? (
                     tradings.map((trading) => <TradingItem key={trading.id} trading={trading} />)
                 ) : (
-                    <Placeholder label="매매 내력이 없습니다." />
+                    <Placeholder label="매매 내역이 없습니다." />
                 )}
 
 

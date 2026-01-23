@@ -1,10 +1,9 @@
 import { useTransition } from "react";
 import { Button } from "../ui/button";
 import {
-    Select,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
+  Select,
+  SelectItem,
+  SelectTrigger,
 } from "../ui/select";
 import { PAGE_SIZES } from "./constants";
 import { PaginatedData } from "./type";
@@ -80,7 +79,6 @@ const Pagination = ({
       onValueChange={handleChangeSize}
       defaultValue={pagination.size.toString()}
       >
-      <SelectValue className="text-sm text-muted-foreground" />
       <SelectTrigger className="h-[36px]">
         {PAGE_SIZES.map((size) => (
           <SelectItem key={size} value={size.toString()}>

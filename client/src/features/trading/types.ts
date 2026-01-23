@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, type TradingStatus } from "@prisma/client";
 
 export type TradingWithMetadata = Prisma.TradingGetPayload<{
   include: {
@@ -7,3 +7,5 @@ export type TradingWithMetadata = Prisma.TradingGetPayload<{
     };
   };
 }> & { isOwner: boolean; permissions: { canDeleteTrading: boolean } };
+
+export type { TradingStatus };

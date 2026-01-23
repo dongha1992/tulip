@@ -1,10 +1,9 @@
 "use client";
 
 import {
-    Select,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectItem,
+  SelectTrigger,
 } from "./ui/select";
 
 export type SortSelectOption = {
@@ -12,6 +11,7 @@ export type SortSelectOption = {
   sortValue: string;
   label: string;
 };
+
 
 type SortObject = {
   sortKey: string;
@@ -39,8 +39,7 @@ const SortSelect = ({ value, onChange, options }: SortSelectProps) => {
       onValueChange={handleSort}
       defaultValue={value.sortKey + "_" + value.sortValue}
     >
-        <SelectValue  />
-        <SelectTrigger>
+      <SelectTrigger>
         {options.map((option) => (
           <SelectItem
             key={option.sortKey + option.sortValue}
@@ -49,7 +48,7 @@ const SortSelect = ({ value, onChange, options }: SortSelectProps) => {
             {option.label}
           </SelectItem>
         ))}
-        </SelectTrigger>
+      </SelectTrigger>
     </Select>
      )
 }

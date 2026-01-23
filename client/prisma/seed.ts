@@ -69,7 +69,7 @@ const seed = async () => {
     data: comments.map((comment) => ({
       ...comment,
       tradingId: dbTradings[0].id,
-      userId: dbUsers[1].id,
+
     })),
   });
 

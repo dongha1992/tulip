@@ -1,6 +1,6 @@
 import { PAGE_SIZES } from "@/components/pagination/constants";
-import { getAuth } from "@/feature/auth/queries/get-auth";
-import { isOwner } from "@/feature/auth/utils/is-owner";
+import { getAuth } from "@/features/auth/queries/get-auth";
+import { isOwner } from "@/features/auth/utils/is-owner";
 import { prisma } from "@/lib/prisma";
 import { ParsedSearchParams } from "../search-params";
 
@@ -11,7 +11,7 @@ export const getTradings = async (
     const { user } = await getAuth();
 
     if (!PAGE_SIZES.includes(searchParams.size)) {
-    throw new Error("잘못된 요청입니다.");
+      throw new Error("잘못된 요청입니다.");
     }
     
 
@@ -30,19 +30,19 @@ export const getTradings = async (
 
     const [tradings, count] = await prisma.$transaction([
         prisma.trading.findMany({
-             where,
-      skip,
-      take,
-      orderBy: {
-        [searchParams.sortKey]: searchParams.sortValue,
-      },
-      include: {
-        user: {
-          select: {
-            username: true,
+            where,
+          skip,
+          take,
+          orderBy: {
+            [searchParams.sortKey]: searchParams.sortValue,
+          },
+        include: {
+          user: {
+            select: {
+              username: true,
+            },
           },
         },
-      },
         }),
         prisma.trading.count({
             where,
@@ -52,11 +52,11 @@ export const getTradings = async (
     return {
         list: tradings.map((trading) => { 
             return {
-                   ...trading,
-                    isOwner: isOwner(user, trading),
-                    permissions: {
-                    canDeleteTrading: isOwner(user, trading)
-                    },
+                ...trading,
+                  isOwner: isOwner(user, trading),
+                  permissions: {
+                  canDeleteTrading: isOwner(user, trading)
+                  },
             }
         }),
         metadata: {

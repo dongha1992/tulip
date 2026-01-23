@@ -1,7 +1,6 @@
-import { getAuth } from "@/feature/auth/queries/get-auth";
-import { isOwner } from "@/feature/auth/utils/is-owner";
+import { getAuth } from "@/features/auth/queries/get-auth";
+import { isOwner } from "@/features/auth/utils/is-owner";
 import { prisma } from "@/lib/prisma";
-
 
 
 export const getTrading = async (id: string) => { 
