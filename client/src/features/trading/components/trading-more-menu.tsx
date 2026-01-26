@@ -1,8 +1,15 @@
-"use client";
+'use client';
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { TRADING_STATUS_LABELS } from "../constants";
-import { TradingStatus, TradingWithMetadata } from "../types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { TRADING_STATUS_LABELS } from '../constants';
+import { TradingStatus, TradingWithMetadata } from '../types';
 
 type TradingMoreMenuProps = {
   trading: TradingWithMetadata;
@@ -10,29 +17,30 @@ type TradingMoreMenuProps = {
 };
 
 function TradingMoreMenu({ trading, trigger }: TradingMoreMenuProps) {
-//   const [deleteButton, deleteDialog] = useConfirmDialog({
-//     action: deleteTrading.bind(null, trading.id),
-//     trigger: (
-//       <DropdownMenuItem disabled={!trading.permissions.canDeleteTrading}>
-//         <LucideTrash className="h-4 w-4" />
-//         <span>Delete</span>
-//       </DropdownMenuItem>
-//     ),
-//   });
+  //   const [deleteButton, deleteDialog] = useConfirmDialog({
+  //     action: deleteTrading.bind(null, trading.id),
+  //     trigger: (
+  //       <DropdownMenuItem disabled={!trading.permissions.canDeleteTrading}>
+  //         <LucideTrash className="h-4 w-4" />
+  //         <span>Delete</span>
+  //       </DropdownMenuItem>
+  //     ),
+  //   });
 
-
-  const handleUpdateTradingStatus = async (value: string) => {}
+  const handleUpdateTradingStatus = async (value: string) => {};
 
   const tradingStatusRadioGroupItems = (
     <DropdownMenuRadioGroup
       value={trading.status}
       onValueChange={handleUpdateTradingStatus}
     >
-      {(Object.keys(TRADING_STATUS_LABELS) as Array<TradingStatus>).map((key) => (
-        <DropdownMenuRadioItem key={key} value={key}>
-          {TRADING_STATUS_LABELS[key]}
-        </DropdownMenuRadioItem>
-      ))}
+      {(Object.keys(TRADING_STATUS_LABELS) as Array<TradingStatus>).map(
+        (key) => (
+          <DropdownMenuRadioItem key={key} value={key}>
+            {TRADING_STATUS_LABELS[key]}
+          </DropdownMenuRadioItem>
+        ),
+      )}
     </DropdownMenuRadioGroup>
   );
 
@@ -52,4 +60,4 @@ function TradingMoreMenu({ trading, trigger }: TradingMoreMenuProps) {
   );
 }
 
-export default TradingMoreMenu  
+export default TradingMoreMenu;

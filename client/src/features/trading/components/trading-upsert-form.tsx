@@ -1,9 +1,7 @@
-"use client";
+'use client';
 
 function TradingUpsertForm() {
-  return (
-    <div>TradingUpsertForm</div>
-  )
+  return <div>TradingUpsertForm</div>;
 }
 
-export default TradingUpsertForm
+export default TradingUpsertForm;

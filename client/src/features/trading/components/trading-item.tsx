@@ -1,41 +1,43 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { tradingEditPath, tradingPath } from "@/paths";
-import clsx from "clsx";
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { tradingEditPath, tradingPath } from '@/paths';
+import clsx from 'clsx';
 import {
-    LucideArrowUpRightFromSquare,
-    LucideMoreVertical,
-    LucidePencil,
-} from "lucide-react";
-import Link from "next/link";
-import { TRADING_ICONS } from "../constants";
-import { TradingWithMetadata } from "../types";
-import TradingMoreMenu from "./trading-more-menu";
+  LucideArrowUpRightFromSquare,
+  LucideMoreVertical,
+  LucidePencil,
+} from 'lucide-react';
+import Link from 'next/link';
+import { TRADING_ICONS } from '../constants';
+import { TradingWithMetadata } from '../types';
+import TradingMoreMenu from './trading-more-menu';
 
 type TradingItemProps = {
   trading: TradingWithMetadata;
   isDetail?: boolean;
+
   attachments?: React.ReactNode;
   referencedTradings?: React.ReactNode;
   comments?: React.ReactNode;
 };
 
 const TradingItem = ({
-    trading,
-    isDetail,
-    attachments,
-    referencedTradings,
-    comments,
-}: TradingItemProps) => { 
-      const detailButton = (
+  trading,
+
+  isDetail,
+  attachments,
+  referencedTradings,
+  comments,
+}: TradingItemProps) => {
+  const detailButton = (
     <Button variant="outline" size="icon" asChild>
       <Link prefetch href={tradingPath(trading.id)}>
         <LucideArrowUpRightFromSquare className="h-4 w-4" />
@@ -62,15 +64,15 @@ const TradingItem = ({
     />
   ) : null;
 
-     return (
-         <div className={clsx("w-full flex flex-col gap-y-4", {
-        "max-w-[580px]": isDetail,
-        "max-w-[420px]": !isDetail,
-      })}>
-             
-             <div className="flex gap-x-2">
-                 
-                 <Card className="w-full">
+  return (
+    <div
+      className={clsx('w-full flex flex-col gap-y-4', {
+        'max-w-[580px]': isDetail,
+        'max-w-[420px]': !isDetail,
+      })}
+    >
+      <div className="flex gap-x-2">
+        <Card className="w-full">
           <CardHeader>
             <CardTitle className="flex gap-x-2">
               <span>{TRADING_ICONS[trading.status]}</span>
@@ -79,8 +81,8 @@ const TradingItem = ({
           </CardHeader>
           <CardContent>
             <span
-              className={clsx("whitespace-break-spaces", {
-                "line-clamp-3": !isDetail,
+              className={clsx('whitespace-break-spaces', {
+                'line-clamp-3': !isDetail,
               })}
             >
               {trading.content}
@@ -91,7 +93,7 @@ const TradingItem = ({
               {trading.deadline} by {trading.user.username}
             </p>
           </CardFooter>
-        </Card> 
+        </Card>
         <div className="flex flex-col gap-y-1">
           {isDetail ? (
             <>
@@ -104,13 +106,13 @@ const TradingItem = ({
               {editButton}
             </>
           )}
-                </div>
-            </div>
-    {/* {attachments}
+        </div>
+      </div>
+      {/* {attachments}
       {referencedTradings}
       {comments} */}
-         </div>
-     )
-}
+    </div>
+  );
+};
 
 export { TradingItem };

@@ -1,8 +1,5 @@
-
 function ReferencedTradings() {
-  return (
-    <div>ReferencedTradings</div>
-  )
+  return <div>ReferencedTradings</div>;
 }
 
-export default ReferencedTradings
+export default ReferencedTradings;

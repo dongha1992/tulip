@@ -6,7 +6,7 @@ import {
   SelectTrigger,
 } from "../ui/select";
 import { PAGE_SIZES } from "./constants";
-import { PaginatedData } from "./type";
+import { PaginatedData } from "./types";
 
 type PageAndSize = {
   page: number;

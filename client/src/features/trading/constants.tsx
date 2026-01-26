@@ -1,5 +1,4 @@
-import { LucideCheckCircle, LucideFileText, LucidePencil } from "lucide-react";
-
+import { LucideCheckCircle, LucideFileText, LucidePencil } from 'lucide-react';
 
 export const TRADING_ICONS = {
   OPEN: <LucideFileText />,
@@ -8,10 +7,7 @@ export const TRADING_ICONS = {
 };
 
 export const TRADING_STATUS_LABELS = {
-  OPEN: "Open",
-  DONE: "Done",
-  IN_PROGRESS: "In Progress",
+  OPEN: 'Open',
+  DONE: 'Done',
+  IN_PROGRESS: 'In Progress',
 };
-
-
-

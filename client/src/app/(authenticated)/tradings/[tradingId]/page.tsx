@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Separator } from "@/components/ui/separator";
 import { Attachments } from "@/features/attachments/components/attachments";
-import { Comments } from "@/features/comment/components/comments/comments";
+import { Comments } from "@/features/comment/components/comments";
 import { ReferencedTradings } from "@/features/trading/components/referenced-tradings";
 import { TradingItem } from "@/features/trading/components/trading-item";
 import { getTrading } from "@/features/trading/queries/get-trading";
@@ -42,6 +42,7 @@ const TradingPage = async ({ params }: TradingPageProps) => {
                 trading={trading}
                 isDetail
                 attachments={
+              
                     <Attachments
                     entityId={trading.id}
                     entity="Trading"

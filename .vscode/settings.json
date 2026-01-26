@@ -57,6 +57,7 @@
     "editor.formatOnSave": true
   },
   "notebook.defaultFormatter": "esbenp.prettier-vscode",
-  "notebook.formatOnSave.enabled": true
+  "notebook.formatOnSave.enabled": true,
+  "editor.formatOnPaste": true
 }
 
