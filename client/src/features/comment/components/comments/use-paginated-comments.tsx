@@ -1,20 +1,18 @@
-import { PaginatedData } from "@/components/pagination/types";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { getComments } from "../../queries/get-comments";
-import { CommentWithMetadata } from "../../types";
-
-
+import { PaginatedData } from '@/components/pagination/types';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { getComments } from '../../queries/get-comments';
+import { CommentWithMetadata } from '../../types';
 
 export const usePaginatedComments = (
-    ticketId: string,
-    paginatedComments: PaginatedData<CommentWithMetadata>
+  tradingId: string,
+  paginatedComments: PaginatedData<CommentWithMetadata>,
 ) => {
-    const queryKey = ["comments", ticketId];
-    
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const queryKey = ['comments', tradingId];
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey,
-      queryFn: ({ pageParam }) => getComments(ticketId, pageParam),
+      queryFn: ({ pageParam }) => getComments(tradingId, pageParam),
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage) =>
         lastPage.metadata.hasNextPage ? lastPage.metadata.cursor : undefined,
@@ -43,5 +41,4 @@ export const usePaginatedComments = (
     onCreateAttachment: () => queryClient.invalidateQueries({ queryKey }),
     onDeleteAttachment: () => queryClient.invalidateQueries({ queryKey }),
   };
-
- }
+};

@@ -31,7 +31,6 @@ type TradingItemProps = {
 
 const TradingItem = ({
   trading,
-
   isDetail,
   attachments,
   referencedTradings,
@@ -108,9 +107,9 @@ const TradingItem = ({
           )}
         </div>
       </div>
-      {/* {attachments}
+      {attachments}
       {referencedTradings}
-      {comments} */}
+      {comments}
     </div>
   );
 };

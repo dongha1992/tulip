@@ -1,4 +1,7 @@
+import { AttachmentDeleteButton } from '@/features/attachments/components/attachment-delete-button';
+import { AttachmentList } from '@/features/attachments/components/attachment-list';
 import { CommentWithMetadata } from '../types';
+import { CommentDeleteButton } from './comment-delete-button';
 import { CommentItem } from './comment-item';
 
 type CommentListProps = {

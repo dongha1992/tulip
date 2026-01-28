@@ -1,13 +1,19 @@
 'use client';
 
+import { useConfirmDialog } from '@/components/confirm-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { LucideTrash } from 'lucide-react';
+import { toast } from 'sonner';
+import { deleteTrading } from '../actions/delete-trading';
+import { updateTradingStatus } from '../actions/update-trading-status';
 import { TRADING_STATUS_LABELS } from '../constants';
 import { TradingStatus, TradingWithMetadata } from '../types';
 
@@ -17,17 +23,31 @@ type TradingMoreMenuProps = {
 };
 
 function TradingMoreMenu({ trading, trigger }: TradingMoreMenuProps) {
-  //   const [deleteButton, deleteDialog] = useConfirmDialog({
-  //     action: deleteTrading.bind(null, trading.id),
-  //     trigger: (
-  //       <DropdownMenuItem disabled={!trading.permissions.canDeleteTrading}>
-  //         <LucideTrash className="h-4 w-4" />
-  //         <span>Delete</span>
-  //       </DropdownMenuItem>
-  //     ),
-  //   });
+  const [deleteButton, deleteDialog] = useConfirmDialog({
+    action: deleteTrading.bind(null, trading.id),
+    trigger: (
+      <DropdownMenuItem disabled={!trading.permissions.canDeleteTrading}>
+        <LucideTrash className="h-4 w-4" />
+        <span>Delete</span>
+      </DropdownMenuItem>
+    ),
+  });
 
-  const handleUpdateTradingStatus = async (value: string) => {};
+  const handleUpdateTradingStatus = async (value: string) => {
+    const promise = updateTradingStatus(trading.id, value as TradingStatus);
+
+    toast.promise(promise, {
+      loading: 'Updating status...',
+    });
+
+    const result = await promise;
+
+    if (result.status === 'ERROR') {
+      toast.error(result.message);
+    } else if (result.status === 'SUCCESS') {
+      toast.success(result.message);
+    }
+  };
 
   const tradingStatusRadioGroupItems = (
     <DropdownMenuRadioGroup
@@ -46,14 +66,13 @@ function TradingMoreMenu({ trading, trigger }: TradingMoreMenuProps) {
 
   return (
     <>
-      {/* {deleteDialog} */}
-
+      {deleteDialog}
       <DropdownMenu>
         <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="right">
           {tradingStatusRadioGroupItems}
           <DropdownMenuSeparator />
-          {/* {deleteButton} */}
+          {deleteButton}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

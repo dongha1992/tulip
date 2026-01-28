@@ -2,8 +2,7 @@
 
 import { useConfirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
-import { LucideLoaderCircle, LucideTrash } from 'lucide-react';
-import { deleteComment } from '../actions/delete-comment';
+import { LucideTrash } from 'lucide-react';
 
 type CommentDeleteButtonProps = {
   id: string;
@@ -15,7 +14,7 @@ const CommentDeleteButton = ({
   onDeleteComment,
 }: CommentDeleteButtonProps) => {
   const [deleteButton, deleteDialog] = useConfirmDialog({
-    action: deleteComment.bind(null, id),
+    action: deleteCommentAction(),
     trigger: (isPending) => (
       <Button variant="outline" size="icon">
         {isPending ? (

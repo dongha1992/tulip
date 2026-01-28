@@ -1,19 +1,20 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Header } from "./_navigation/header";
-import { Sidebar } from "./_navigation/sidebar/components/sidebar";
-import "./global.css";
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { Header } from './_navigation/header';
+import { Sidebar } from './_navigation/sidebar/components/sidebar';
+import { ReactQueryProvider } from './_provider/react-query-provider';
+import './global.css';
 
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+  src: './fonts/GeistVF.woff',
+  variable: '--font-geist-sans',
+  weight: '100 900',
 });
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+  src: './fonts/GeistMonoVF.woff',
+  variable: '--font-geist-mono',
+  weight: '100 900',
 });
 
 export const metadata: Metadata = {
@@ -28,20 +29,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-   <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
         <NuqsAdapter>
-          <Header />
-          <div className="flex h-screen">
-            <Sidebar />
-            <main className="flex flex-1 min-h-screen flex-col py-24 px-8 bg-secondary/20">
-              {children}  
-            </main>
-          </div>
-          
+          <ReactQueryProvider>
+            <Header />
+            <div className="flex h-screen">
+              <Sidebar />
+              <main className="flex flex-1 min-h-screen flex-col py-24 px-8 bg-secondary/20">
+                {children}
+              </main>
+            </div>
+          </ReactQueryProvider>
         </NuqsAdapter>
       </body>
     </html>
