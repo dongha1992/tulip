@@ -1,8 +1,8 @@
 'use server';
 
 import {
-    fromErrorToActionState,
-    toActionState,
+  fromErrorToActionState,
+  toActionState,
 } from '@/components/form/utils/to-action-state';
 import { getAuthOrRedirect } from '@/features/auth/queries/get-auth-or-redirect';
 import { isOwner } from '@/features/auth/utils/is-owner';

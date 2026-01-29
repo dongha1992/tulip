@@ -3,6 +3,7 @@ import { Separator } from '@/components/ui/separator';
 import { Attachments } from '@/features/attachments/components';
 import { Comments } from '@/features/comment/components/comments';
 import { getComments } from '@/features/comment/queries/get-comments';
+import { ReferencedTradings } from '@/features/trading/components/referenced-tradings';
 import { TradingItem } from '@/features/trading/components/trading-item';
 import { getTrading } from '@/features/trading/queries/get-trading';
 import { homePath } from '@/paths';
@@ -44,11 +45,11 @@ const TradingPage = async ({ params }: TradingPageProps) => {
           attachments={
             <Attachments
               entityId={trading.id}
-              entity="Trading"
+              entity="TRADING"
               isOwner={trading.isOwner}
             />
           }
-          // referencedTradings={<ReferencedTradings tradingId={trading.id} />}
+          referencedTradings={<ReferencedTradings tradingId={trading.id} />}
           comments={
             <Comments
               tradingId={trading.id}

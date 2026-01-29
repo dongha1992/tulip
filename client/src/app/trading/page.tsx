@@ -1,23 +1,20 @@
-import { Heading } from "@/components/heading";
-import { Spinner } from "@/components/spinner";
-import { TradingList } from "@/features/trading/components/trading-list";
-import { searchParamsCache } from "@/features/trading/search-params";
-import { SearchParams } from "nuqs/server";
-import { Suspense } from "react";
+import { Heading } from '@/components/heading';
+import { Spinner } from '@/components/spinner';
+import { TradingList } from '@/features/trading/components/trading-list';
+import { searchParamsCache } from '@/features/trading/search-params';
+import { SearchParams } from 'nuqs/server';
+import { Suspense } from 'react';
 
-type HomePageProps = {
+type AllTradingPageProps = {
   searchParams: Promise<SearchParams>;
 };
 
-const HomePage = async ({ searchParams }: HomePageProps) => {
+const AllTradingPage = async ({ searchParams }: AllTradingPageProps) => {
   return (
     <div className="flex-1 flex flex-col gap-y-8">
-      <Heading
-        title="모든 매매 내역"
-        description="매매를 복기해보자"
-      />
+      <Heading title="모든 매매 내역" description="매매를 복기해보자" />
 
-      <Suspense fallback={<Spinner />}> 
+      <Suspense fallback={<Spinner />}>
         <TradingList
           searchParams={searchParamsCache.parse(await searchParams)}
         />
@@ -26,4 +23,4 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
   );
 };
 
-export default HomePage;
+export default AllTradingPage;

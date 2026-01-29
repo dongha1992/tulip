@@ -4,7 +4,7 @@ import { useConfirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import { LucideLoaderCircle, LucideTrash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { deleteAttachment } from '../actions/delete-attachment';
+import { deleteAttachment } from '../actions/delete-attachments';
 
 type AttachmentDeleteButtonProps = {
   id: string;

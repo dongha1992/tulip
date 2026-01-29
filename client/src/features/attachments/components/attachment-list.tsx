@@ -1,29 +1,23 @@
-'use client';
-
-type Attachment = {
-  id: string;
-  name: string;
-};
+import type { Attachment } from '@prisma/client';
+import { AttachmentItem } from './attachment-item';
 
 type AttachmentListProps = {
   attachments: Attachment[];
-  buttons?: (attachmentId: string) => React.ReactNode[];
+  buttons: (id: string) => React.ReactNode[];
 };
 
 const AttachmentList = ({ attachments, buttons }: AttachmentListProps) => {
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="mx-2 flex flex-col gap-y-2 mb-4">
       {attachments.map((attachment) => (
-        <div key={attachment.id} className="flex items-center gap-x-2">
-          <span className="text-sm">{attachment.name}</span>
-          {buttons && (
-            <div className="flex gap-x-1">{buttons(attachment.id)}</div>
-          )}
-        </div>
+        <AttachmentItem
+          key={attachment.id}
+          attachment={attachment}
+          buttons={buttons(attachment.id)}
+        />
       ))}
     </div>
   );
 };
 
 export { AttachmentList };
-

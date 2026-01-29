@@ -1,11 +1,41 @@
-// type AttachmentsProps = {
-//   entityId: string;
-//   entity: AttachmentEntity;
-//   isOwner: boolean;
-// };
+import { CardCompact } from '@/components/card-compact';
+import { AttachmentEntity } from '@prisma/client';
+import { getAttachments } from '../queries/get-attachments';
+import { AttachmentCreateForm } from './attachment-create-form';
+import { AttachmentDeleteButton } from './attachment-delete-button';
+import { AttachmentList } from './attachment-list';
 
-const Attachments = async ({ entityId, entity, isOwner }: any) => {
-  return <div>Attachments</div>;
+type AttachmentsProps = {
+  entityId: string;
+  entity: AttachmentEntity;
+  isOwner: boolean;
+};
+
+const Attachments = async ({ entityId, entity, isOwner }: AttachmentsProps) => {
+  const attachments = await getAttachments(entityId, entity);
+
+  return (
+    <CardCompact
+      title="Attachments"
+      description="Attached images or PDFs"
+      content={
+        <>
+          <AttachmentList
+            attachments={attachments}
+            buttons={(attachmentId: string) => [
+              ...(isOwner
+                ? [<AttachmentDeleteButton key="0" id={attachmentId} />]
+                : []),
+            ]}
+          />
+
+          {isOwner && (
+            <AttachmentCreateForm entityId={entityId} entity={entity} />
+          )}
+        </>
+      }
+    />
+  );
 };
 
 export { Attachments };

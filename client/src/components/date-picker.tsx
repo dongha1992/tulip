@@ -3,9 +3,9 @@
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { LucideCalendar } from 'lucide-react';
@@ -19,7 +19,7 @@ type DatePickerProps = {
   id: string;
   name: string;
   defaultValue?: string | undefined;
-  imperativeHandleRef?: React.RefObject<ImperativeHandleFromDatePicker>;
+  imperativeHandleRef?: React.RefObject<ImperativeHandleFromDatePicker | null>;
 };
 
 const DatePicker = ({

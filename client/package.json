@@ -10,10 +10,12 @@
     "prisma-seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.975.0",
     "@node-rs/argon2": "^2.0.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@prisma/client": "^6.19.2",
+    "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@sparticuz/chromium-min": "^126.0.0",
@@ -34,6 +36,7 @@
     "prisma": "^6.19.2",
     "puppeteer-core": "^22.13.1",
     "react": "^19.0.0",
+    "react-day-picker": "^9.13.0",
     "react-dom": "^19.0.0",
     "react-intersection-observer": "^10.0.2",
     "sharp": "^0.33.5",

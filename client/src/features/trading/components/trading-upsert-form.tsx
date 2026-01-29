@@ -11,12 +11,12 @@ import { EMPTY_ACTION_STATE } from '@/components/form/utils/to-action-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Trading } from '@prisma/client';
 import { useActionState, useRef } from 'react';
 import { upsertTrading } from '../actions/upsert-trading';
+import { type TradingForUpsert } from '../types';
 
 type TradingUpsertFormProps = {
-  trading?: Trading;
+  trading?: TradingForUpsert;
 };
 
 const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
@@ -26,7 +26,7 @@ const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
   );
 
   const datePickerImperativeHandleRef =
-    useRef<ImperativeHandleFromDatePicker>(null);
+    useRef<ImperativeHandleFromDatePicker | null>(null);
 
   const handleSuccess = () => {
     datePickerImperativeHandleRef.current?.reset();
@@ -75,7 +75,7 @@ const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
             id="buy"
             name="buy"
             type="number"
-            step=".01"
+            step="1"
             defaultValue={
               (actionState.payload?.get('buy') as string) ?? trading?.buy
             }
