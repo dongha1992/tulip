@@ -1,4 +1,4 @@
-import { LucideLoaderCircle } from "lucide-react";
+import { LucideLoaderCircle } from 'lucide-react';
 
 const Spinner = () => {
   return (

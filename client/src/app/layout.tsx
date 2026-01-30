@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
@@ -5,7 +6,6 @@ import { Header } from './_navigation/header';
 import { Sidebar } from './_navigation/sidebar/components/sidebar';
 import { ReactQueryProvider } from './_provider/react-query-provider';
 import './global.css';
-
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -43,6 +43,7 @@ export default function RootLayout({
                 {children}
               </main>
             </div>
+            <Toaster expand />
           </ReactQueryProvider>
         </NuqsAdapter>
       </body>

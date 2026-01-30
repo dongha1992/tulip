@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { deleteTrading } from '../actions/delete-trading';
 import { updateTradingStatus } from '../actions/update-trading-status';
 import { TRADING_STATUS_LABELS } from '../constants';
-import { TradingStatus, TradingWithMetadata } from '../types';
+import type { TradingStatus, TradingWithMetadata } from '../types';
 
 type TradingMoreMenuProps = {
   trading: TradingWithMetadata;

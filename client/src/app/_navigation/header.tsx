@@ -1,11 +1,37 @@
 'use client';
 
 import { buttonVariants } from '@/components/ui/button';
-import { homePath } from '@/paths';
+import { useAuth } from '@/features/auth/hooks/use-auth';
+import { homePath, signInPath, signUpPath } from '@/paths';
 import { LucideKanban } from 'lucide-react';
 import Link from 'next/link';
+import { AccountDropdown } from './account-dropdown';
 
 const Header = () => {
+  const { user, isFetched } = useAuth();
+
+  if (!isFetched) {
+    return null;
+  }
+
+  const navItems = user ? (
+    <AccountDropdown user={user} />
+  ) : (
+    <>
+      <Link
+        href={signUpPath()}
+        className={buttonVariants({ variant: 'outline' })}
+      >
+        Sign Up
+      </Link>
+      <Link
+        href={signInPath()}
+        className={buttonVariants({ variant: 'default' })}
+      >
+        Sign In
+      </Link>
+    </>
+  );
   return (
     <nav
       className="
@@ -25,10 +51,10 @@ const Header = () => {
           <h1 className="text-lg font-semibold">홈</h1>
         </Link>
       </div>
-      {/* <div className="flex align-items gap-x-2">
-               <ThemeSwitcher />
-               {navItems}
-               </div> */}
+      <div className="flex align-items gap-x-2">
+        {/* <ThemeSwitcher /> */}
+        {navItems}
+      </div>
     </nav>
   );
 };

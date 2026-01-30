@@ -1,14 +1,13 @@
-import { hashToken } from "@/utils/crypto";
-import { prisma } from "./prisma";
+import { hashToken } from '@/utils/crypto';
+import { prisma } from './prisma';
 
 const SESSION_REFRESH_INTERVAL_MS = 1000 * 60 * 60 * 24 * 15; // 15일
 const SESSION_MAX_DURATION_MS = SESSION_REFRESH_INTERVAL_MS * 2; // 30일
 
+export const createSession = async (sessionToken: string, userId: string) => {
+  const sessionId = hashToken(sessionToken);
 
-export const createSession = async (sessionToken: string, userId: string) => { 
-    const sessionId = hashToken(sessionToken);
-
-    const session = {
+  const session = {
     id: sessionId,
     userId,
     expiresAt: new Date(Date.now() + SESSION_MAX_DURATION_MS),
@@ -19,10 +18,10 @@ export const createSession = async (sessionToken: string, userId: string) => {
   });
 
   return session;
-}
+};
 
-export const validateSession = async (sessionToken: string) => { 
-      const sessionId = hashToken(sessionToken);
+export const validateSession = async (sessionToken: string) => {
+  const sessionId = hashToken(sessionToken);
 
   const result = await prisma.session.findUnique({
     where: {
@@ -32,15 +31,14 @@ export const validateSession = async (sessionToken: string) => {
       user: true,
     },
   });
-    
-     if (!result) {
+
+  if (!result) {
     return { session: null, user: null };
   }
 
-    const { user, ...session } = result;
+  const { user, ...session } = result;
 
-     if (Date.now() >= session.expiresAt.getTime()) {
- 
+  if (Date.now() >= session.expiresAt.getTime()) {
     await prisma.session.delete({
       where: {
         id: sessionId,
@@ -49,7 +47,7 @@ export const validateSession = async (sessionToken: string) => {
 
     return { session: null, user: null };
   }
- if (Date.now() >= session.expiresAt.getTime() - SESSION_REFRESH_INTERVAL_MS) {
+  if (Date.now() >= session.expiresAt.getTime() - SESSION_REFRESH_INTERVAL_MS) {
     session.expiresAt = new Date(Date.now() + SESSION_MAX_DURATION_MS);
 
     await prisma.session.update({
@@ -63,11 +61,12 @@ export const validateSession = async (sessionToken: string) => {
   }
 
   return { session, user };
-}
+};
 
-export const invalidateSession = async (sessionId: string) => {  await prisma.session.delete({
+export const invalidateSession = async (sessionId: string) => {
+  await prisma.session.delete({
     where: {
       id: sessionId,
     },
-});
-}
+  });
+};

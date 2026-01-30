@@ -11,12 +11,12 @@ import { EMPTY_ACTION_STATE } from '@/components/form/utils/to-action-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import type { Trading } from '@prisma/client';
 import { useActionState, useRef } from 'react';
 import { upsertTrading } from '../actions/upsert-trading';
-import { type TradingForUpsert } from '../types';
 
 type TradingUpsertFormProps = {
-  trading?: TradingForUpsert;
+  trading?: Trading;
 };
 
 const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {

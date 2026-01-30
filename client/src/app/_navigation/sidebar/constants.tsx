@@ -1,13 +1,24 @@
-import { homePath } from '@/paths';
-import { LucideLibrary } from 'lucide-react';
+import { accountProfilePath, allTradingPath, homePath } from '@/paths';
+import { BadgeDollarSign, LucideLibrary, User } from 'lucide-react';
 
 import { NavItem } from './types';
 
 export const navItems: NavItem[] = [
   {
-    title: 'home',
+    title: '홈',
     icon: <LucideLibrary />,
     href: homePath(),
+  },
+
+  {
+    title: '매매 기록',
+    icon: <BadgeDollarSign />,
+    href: allTradingPath(),
+  },
+  {
+    title: '내 계정',
+    icon: <User />,
+    href: accountProfilePath(),
   },
 ];
 

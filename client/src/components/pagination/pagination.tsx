@@ -1,12 +1,8 @@
-import { useTransition } from "react";
-import { Button } from "../ui/button";
-import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-} from "../ui/select";
-import { PAGE_SIZES } from "./constants";
-import { PaginatedData } from "./types";
+import { useTransition } from 'react';
+import { Button } from '../ui/button';
+import { Select, SelectItem, SelectTrigger } from '../ui/select';
+import { PAGE_SIZES } from './constants';
+import { PaginatedData } from './types';
 
 type PageAndSize = {
   page: number;
@@ -16,16 +12,14 @@ type PageAndSize = {
 type PaginationProps = {
   pagination: PageAndSize;
   onPagination: (pagination: PageAndSize) => void;
-  paginatedMetadata: PaginatedData<unknown>["metadata"];
+  paginatedMetadata: PaginatedData<unknown>['metadata'];
 };
 
-
-
 const Pagination = ({
-    pagination,
-    onPagination,
-    paginatedMetadata: { count, hasNextPage },
-}: PaginationProps) => { 
+  pagination,
+  onPagination,
+  paginatedMetadata: { count, hasNextPage },
+}: PaginationProps) => {
   const startOffset = pagination.page * pagination.size + 1;
   const endOffset = startOffset - 1 + pagination.size;
   const actualEndOffset = Math.min(endOffset, count);
@@ -52,7 +46,7 @@ const Pagination = ({
     });
   };
 
-    const previousButton = (
+  const previousButton = (
     <Button
       variant="outline"
       size="sm"
@@ -78,7 +72,7 @@ const Pagination = ({
     <Select
       onValueChange={handleChangeSize}
       defaultValue={pagination.size.toString()}
-      >
+    >
       <SelectTrigger className="h-[36px]">
         {PAGE_SIZES.map((size) => (
           <SelectItem key={size} value={size.toString()}>
@@ -89,7 +83,7 @@ const Pagination = ({
     </Select>
   );
 
-    return (
+  return (
     <div className="flex justify-between items-center">
       <p className="text-sm text-muted-foreground">{label}</p>
       <div className="flex gap-x-2">
@@ -99,7 +93,6 @@ const Pagination = ({
       </div>
     </div>
   );
-
-}
+};
 
 export { Pagination };
