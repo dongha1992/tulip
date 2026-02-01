@@ -47,6 +47,7 @@ const TradingPage = async ({ params }: TradingPageProps) => {
               entityId={trading.id}
               entity="TRADING"
               isOwner={trading.isOwner}
+              isDetail={true}
             />
           }
           referencedTradings={<ReferencedTradings tradingId={trading.id} />}

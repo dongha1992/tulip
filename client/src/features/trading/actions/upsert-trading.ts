@@ -3,9 +3,11 @@
 import { setCookieByKey } from '@/actions/cookies';
 import {
   ActionState,
+  EMPTY_ACTION_STATE,
   fromErrorToActionState,
   toActionState,
 } from '@/components/form/utils/to-action-state';
+import { createAttachments } from '@/features/attachments/actions/create-attachments';
 import { getAuthOrRedirect } from '@/features/auth/queries/get-auth-or-redirect';
 import { isOwner } from '@/features/auth/utils/is-owner';
 import { prisma } from '@/lib/prisma';
@@ -27,6 +29,7 @@ export const upsertTrading = async (
   formData: FormData,
 ) => {
   const { user } = await getAuthOrRedirect();
+  let createdId: string | null = null;
   try {
     if (id) {
       const trading = await prisma.trading.findUnique({
@@ -52,11 +55,23 @@ export const upsertTrading = async (
       userId: user.id,
     };
 
-    await prisma.trading.upsert({
+    const result = await prisma.trading.upsert({
       where: { id: id || '' },
       update: dbData,
       create: { ...dbData },
     });
+
+    if (!id) {
+      createdId = result.id;
+      if (formData.getAll('files').length > 0) {
+        console.log('here');
+        await createAttachments(
+          { entityId: result.id, entity: 'TRADING' },
+          EMPTY_ACTION_STATE,
+          formData,
+        );
+      }
+    }
   } catch (error) {
     return fromErrorToActionState(error, formData);
   }
@@ -68,5 +83,8 @@ export const upsertTrading = async (
     redirect(tradingPath(id));
   }
 
-  return toActionState('SUCCESS', '생성되었습니다.');
+  if (!createdId) throw new Error('ID가 없습니다.');
+
+  await setCookieByKey('toast', '생성되었습니다.');
+  redirect(tradingPath(createdId));
 };

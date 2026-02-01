@@ -3,7 +3,6 @@ import { Prisma } from '@prisma/client';
 type AttachmentSubjectTrading = Prisma.TradingGetPayload<{
   select: {
     id: true;
-
     userId: true;
   };
 }>;
@@ -25,7 +24,7 @@ export type AttachmentSubject =
 export const isTrading = (
   subject: AttachmentSubject,
 ): subject is AttachmentSubjectTrading => {
-  return 'organizationId' in subject;
+  return !('trading' in subject);
 };
 
 export const isComment = (

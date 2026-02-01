@@ -11,15 +11,25 @@ import { EMPTY_ACTION_STATE } from '@/components/form/utils/to-action-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import type { Trading } from '@prisma/client';
+import { UploadFileInput } from '@/components/upload-file-input';
+import { AttachmentCreateForm } from '@/features/attachments/components/attachment-create-form';
+import { AttachmentDeleteButton } from '@/features/attachments/components/attachment-delete-button';
+import { AttachmentList } from '@/features/attachments/components/attachment-list';
+import type { Attachment, Trading } from '@prisma/client';
+import { useRouter } from 'next/navigation';
 import { useActionState, useRef } from 'react';
 import { upsertTrading } from '../actions/upsert-trading';
 
 type TradingUpsertFormProps = {
   trading?: Trading;
+  attachments?: Attachment[];
 };
 
-const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
+const TradingUpsertForm = ({
+  trading,
+  attachments = [],
+}: TradingUpsertFormProps) => {
+  const router = useRouter();
   const [actionState, action] = useActionState(
     upsertTrading.bind(null, trading?.id),
     EMPTY_ACTION_STATE,
@@ -34,7 +44,7 @@ const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
 
   return (
     <Form action={action} actionState={actionState} onSuccess={handleSuccess}>
-      <Label htmlFor="title">Title</Label>
+      <Label htmlFor="title">종목</Label>
       <Input
         id="title"
         name="title"
@@ -45,7 +55,7 @@ const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
       />
       <FieldError actionState={actionState} name="title" />
 
-      <Label htmlFor="content">Content</Label>
+      <Label htmlFor="content">내용</Label>
       <Textarea
         id="content"
         name="content"
@@ -57,7 +67,7 @@ const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
 
       <div className="flex gap-x-2 mb-1">
         <div className="w-1/2">
-          <Label htmlFor="deadline">Deadline</Label>
+          <Label htmlFor="deadline">매수 시점</Label>
           <DatePicker
             id="deadline"
             name="deadline"
@@ -70,7 +80,7 @@ const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
           <FieldError actionState={actionState} name="deadline" />
         </div>
         <div className="w-1/2">
-          <Label htmlFor="buy">buy (원)</Label>
+          <Label htmlFor="buy">평균 매수 가격($)</Label>
           <Input
             id="buy"
             name="buy"
@@ -84,7 +94,33 @@ const TradingUpsertForm = ({ trading }: TradingUpsertFormProps) => {
         </div>
       </div>
 
-      <SubmitButton label={trading ? 'Edit' : 'Create'} />
+      <div className="space-y-2">
+        <Label htmlFor="files">첨부파일</Label>
+        {trading?.id ? (
+          <>
+            {attachments.length > 0 && (
+              <AttachmentList
+                attachments={attachments}
+                buttons={(attachmentId) => [
+                  <AttachmentDeleteButton
+                    key={attachmentId}
+                    id={attachmentId}
+                  />,
+                ]}
+              />
+            )}
+            <AttachmentCreateForm
+              entityId={trading.id}
+              entity="TRADING"
+              onSuccess={() => router.refresh()}
+            />
+          </>
+        ) : (
+          <UploadFileInput id="files" name="files" />
+        )}
+      </div>
+
+      <SubmitButton label={trading ? '수정' : '생성'} />
     </Form>
   );
 };

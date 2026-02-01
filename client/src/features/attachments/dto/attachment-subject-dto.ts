@@ -15,7 +15,7 @@ export const fromTrading = (trading: AttachmentSubject | null) => {
   }
 
   return {
-    entity: 'Trading' as AttachmentEntity,
+    entity: 'TRADING' as AttachmentEntity,
     entityId: trading.id,
     userId: trading.userId,
     tradingId: trading.id,

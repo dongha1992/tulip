@@ -36,8 +36,8 @@ const Comments = ({ tradingId, paginatedComments }: CommentsProps) => {
   return (
     <>
       <CardCompact
-        title="댓글 작성"
-        description="댓글을 작성해주세요."
+        title=""
+        description=""
         content={
           <CommentCreateForm
             tradingId={tradingId}

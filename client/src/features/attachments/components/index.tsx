@@ -9,15 +9,21 @@ type AttachmentsProps = {
   entityId: string;
   entity: AttachmentEntity;
   isOwner: boolean;
+  isDetail?: boolean;
 };
 
-const Attachments = async ({ entityId, entity, isOwner }: AttachmentsProps) => {
+const Attachments = async ({
+  entityId,
+  entity,
+  isOwner,
+  isDetail,
+}: AttachmentsProps) => {
   const attachments = await getAttachments(entityId, entity);
 
   return (
     <CardCompact
-      title="Attachments"
-      description="Attached images or PDFs"
+      title=""
+      description=""
       content={
         <>
           <AttachmentList
@@ -28,8 +34,7 @@ const Attachments = async ({ entityId, entity, isOwner }: AttachmentsProps) => {
                 : []),
             ]}
           />
-
-          {isOwner && (
+          {isOwner && !isDetail && (
             <AttachmentCreateForm entityId={entityId} entity={entity} />
           )}
         </>

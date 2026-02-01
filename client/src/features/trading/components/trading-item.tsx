@@ -78,7 +78,7 @@ const TradingItem = ({
               <span className="truncate">{trading.title}</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-y-2">
             <span
               className={clsx('whitespace-break-spaces', {
                 'line-clamp-3': !isDetail,
@@ -86,7 +86,9 @@ const TradingItem = ({
             >
               {trading.content}
             </span>
+            {attachments}
           </CardContent>
+
           <CardFooter className="flex justify-between">
             <p className="text-sm text-muted-foreground">
               {trading.deadline} by {trading.user.username}
@@ -107,7 +109,6 @@ const TradingItem = ({
           )}
         </div>
       </div>
-      {attachments}
       {referencedTradings}
       {comments}
     </div>

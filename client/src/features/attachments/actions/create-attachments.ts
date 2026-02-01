@@ -1,3 +1,5 @@
+'use server';
+
 import {
   ActionState,
   fromErrorToActionState,
@@ -13,7 +15,10 @@ import { filesSchema } from '../schema/files';
 import * as attachmentService from '../service';
 
 const createAttachmentsSchema = z.object({
-  files: filesSchema.refine((files) => files.length !== 0, 'File is required'),
+  files: filesSchema.refine(
+    (files) => files.length !== 0,
+    '파일이 필요합니다.',
+  ),
 });
 
 type CreateAttachmentsArgs = {
@@ -27,6 +32,7 @@ export const createAttachments = async (
   formData: FormData,
 ) => {
   const { user } = await getAuthOrRedirect();
+
   const subject = await attachmentService.getAttachmentSubject(
     entityId,
     entity,

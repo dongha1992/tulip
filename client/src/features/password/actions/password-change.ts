@@ -1,9 +1,9 @@
 'use server';
 
 import {
-    ActionState,
-    fromErrorToActionState,
-    toActionState,
+  ActionState,
+  fromErrorToActionState,
+  toActionState,
 } from '@/components/form/utils/to-action-state';
 import { getAuthOrRedirect } from '@/features/auth/queries/get-auth-or-redirect';
 import { prisma } from '@/lib/prisma';
