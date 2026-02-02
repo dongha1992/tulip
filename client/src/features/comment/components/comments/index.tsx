@@ -33,25 +33,15 @@ const Comments = ({ tradingId, paginatedComments }: CommentsProps) => {
       fetchNextPage();
     }
   }, [fetchNextPage, hasNextPage, inView, isFetchingNextPage]);
+
   return (
     <>
-      <CardCompact
-        title=""
-        description=""
-        content={
-          <CommentCreateForm
-            tradingId={tradingId}
-            onCreateComment={onCreateComment}
-          />
-        }
-      />
-      <div className="flex flex-col gap-y-2 ml-8">
+      <div className="flex flex-col gap-y-2">
         <CommentList
           comments={comments}
           onDeleteComment={onDeleteComment}
           onDeleteAttachment={onDeleteAttachment}
         />
-
         {isFetchingNextPage && (
           <>
             <div className="flex gap-x-2">
@@ -64,10 +54,21 @@ const Comments = ({ tradingId, paginatedComments }: CommentsProps) => {
             </div>
           </>
         )}
+
+        <CardCompact
+          title=""
+          description=""
+          content={
+            <CommentCreateForm
+              tradingId={tradingId}
+              onCreateComment={onCreateComment}
+            />
+          }
+        />
       </div>
       <div ref={ref}>
         {!hasNextPage && (
-          <p className="text-right text-xs italic">No more comments.</p>
+          <p className="text-right text-xs italic">댓글이 더 이상 없습니다.</p>
         )}
       </div>
     </>

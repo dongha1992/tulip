@@ -1,40 +1,24 @@
 'use client';
 
 import {
-  isServer,
-  QueryClient,
-  QueryClientProvider,
+    QueryClient,
+    QueryClientProvider,
 } from '@tanstack/react-query';
+import { useState } from 'react';
 
-const CONFIGURATION = {
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000,
+const makeQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { staleTime: 60 * 1000 },
     },
-  },
-};
-
-const makeQueryClient = () => {
-  return new QueryClient(CONFIGURATION);
-};
-
-let browserQueryClient: QueryClient | undefined = undefined;
-
-const getQueryClient = () => {
-  if (isServer) {
-    return makeQueryClient();
-  } else {
-    if (!browserQueryClient) browserQueryClient = makeQueryClient();
-    return browserQueryClient;
-  }
-};
+  });
 
 type ReactQueryProviderProps = {
   children: React.ReactNode;
 };
 
 const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
-  const queryClient = getQueryClient();
+  const [queryClient] = useState(() => makeQueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

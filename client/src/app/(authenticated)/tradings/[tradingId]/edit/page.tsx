@@ -38,8 +38,8 @@ const TradingEditPage = async ({ params }: TradingEditPageProps) => {
 
       <div className="flex-1 flex flex-col justify-center items-center">
         <CardCompact
-          title="Edit Trading"
-          description="Edit an existing trading"
+          title="수정하기"
+          description=""
           className="w-full max-w-[420px] animate-fade-from-top"
           content={
             <TradingUpsertForm trading={trading} attachments={attachments} />

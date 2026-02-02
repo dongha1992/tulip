@@ -15,8 +15,8 @@ const ReferencedTradings = async ({ tradingId }: ReferencedTradingsProps) => {
 
   return (
     <CardCompact
-      title="Referenced Tradings"
-      description="Tradings that have been referenced in comments"
+      title="언급된 매매 기록"
+      description="댓글에 언급된 매매 기록"
       content={
         <div className="mx-2 mb-4">
           {referencedTradings.map((referencedTrading) => (

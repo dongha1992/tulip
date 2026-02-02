@@ -38,7 +38,7 @@ const Breadcrumbs = ({ breadcrumbs }: BreadcrumbsProps) => {
 
           if (breadcrumb.href) {
             breadcrumbItem = (
-              <BreadcrumbLink>
+              <BreadcrumbLink asChild>
                 <Link
                   href={breadcrumb.href}
                   className="flex items-center gap-1"
@@ -52,13 +52,16 @@ const Breadcrumbs = ({ breadcrumbs }: BreadcrumbsProps) => {
           if (breadcrumb.dropdown) {
             breadcrumbItem = (
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1">
+                <DropdownMenuTrigger
+                  asChild
+                  className="flex items-center gap-1"
+                >
                   {breadcrumb.title}
                   <LucideChevronDown className="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   {breadcrumb.dropdown.map((item) => (
-                    <DropdownMenuItem key={item.href}>
+                    <DropdownMenuItem asChild key={item.href}>
                       <Link href={item.href}>{item.title}</Link>
                     </DropdownMenuItem>
                   ))}

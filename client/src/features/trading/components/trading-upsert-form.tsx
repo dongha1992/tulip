@@ -43,62 +43,67 @@ const TradingUpsertForm = ({
   };
 
   return (
-    <Form action={action} actionState={actionState} onSuccess={handleSuccess}>
-      <Label htmlFor="title">종목</Label>
-      <Input
-        id="title"
-        name="title"
-        type="text"
-        defaultValue={
-          (actionState.payload?.get('title') as string) ?? trading?.title
-        }
-      />
-      <FieldError actionState={actionState} name="title" />
+    <>
+      <Form
+        id="trading-form"
+        action={action}
+        actionState={actionState}
+        onSuccess={handleSuccess}
+      >
+        <Label htmlFor="title">종목</Label>
+        <Input
+          id="title"
+          name="title"
+          type="text"
+          defaultValue={
+            (actionState.payload?.get('title') as string) ?? trading?.title
+          }
+        />
+        <FieldError actionState={actionState} name="title" />
 
-      <Label htmlFor="content">내용</Label>
-      <Textarea
-        id="content"
-        name="content"
-        defaultValue={
-          (actionState.payload?.get('content') as string) ?? trading?.content
-        }
-      />
-      <FieldError actionState={actionState} name="content" />
+        <Label htmlFor="content">내용</Label>
+        <Textarea
+          id="content"
+          name="content"
+          defaultValue={
+            (actionState.payload?.get('content') as string) ?? trading?.content
+          }
+        />
+        <FieldError actionState={actionState} name="content" />
 
-      <div className="flex gap-x-2 mb-1">
-        <div className="w-1/2">
-          <Label htmlFor="deadline">매수 시점</Label>
-          <DatePicker
-            id="deadline"
-            name="deadline"
-            defaultValue={
-              (actionState.payload?.get('deadline') as string) ??
-              trading?.deadline
-            }
-            imperativeHandleRef={datePickerImperativeHandleRef}
-          />
-          <FieldError actionState={actionState} name="deadline" />
+        <div className="flex gap-x-2 mb-1">
+          <div className="w-1/2">
+            <Label htmlFor="deadline">매수 시점</Label>
+            <DatePicker
+              id="deadline"
+              name="deadline"
+              defaultValue={
+                (actionState.payload?.get('deadline') as string) ??
+                trading?.deadline
+              }
+              imperativeHandleRef={datePickerImperativeHandleRef}
+            />
+            <FieldError actionState={actionState} name="deadline" />
+          </div>
+          <div className="w-1/2">
+            <Label htmlFor="buy">평균 매수 가격($)</Label>
+            <Input
+              id="buy"
+              name="buy"
+              type="number"
+              step="1"
+              defaultValue={
+                (actionState.payload?.get('buy') as string) ?? trading?.buy
+              }
+            />
+            <FieldError actionState={actionState} name="buy" />
+          </div>
         </div>
-        <div className="w-1/2">
-          <Label htmlFor="buy">평균 매수 가격($)</Label>
-          <Input
-            id="buy"
-            name="buy"
-            type="number"
-            step="1"
-            defaultValue={
-              (actionState.payload?.get('buy') as string) ?? trading?.buy
-            }
-          />
-          <FieldError actionState={actionState} name="buy" />
-        </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="files">첨부파일</Label>
-        {trading?.id ? (
-          <>
-            {attachments.length > 0 && (
+        <div className="space-y-2">
+          <Label htmlFor="files">첨부파일</Label>
+          {trading?.id ? (
+            attachments.length > 0 && (
               <AttachmentList
                 attachments={attachments}
                 buttons={(attachmentId) => [
@@ -108,20 +113,25 @@ const TradingUpsertForm = ({
                   />,
                 ]}
               />
-            )}
-            <AttachmentCreateForm
-              entityId={trading.id}
-              entity="TRADING"
-              onSuccess={() => router.refresh()}
-            />
-          </>
-        ) : (
-          <UploadFileInput id="files" name="files" />
-        )}
-      </div>
-
-      <SubmitButton label={trading ? '수정' : '생성'} />
-    </Form>
+            )
+          ) : (
+            <UploadFileInput id="files" name="files" />
+          )}
+        </div>
+      </Form>
+      {trading?.id && (
+        <AttachmentCreateForm
+          entityId={trading.id}
+          entity="TRADING"
+          onSuccess={() => router.refresh()}
+        />
+      )}
+      <SubmitButton
+        className="w-full max-w-[420px] mt-2"
+        form="trading-form"
+        label={trading ? '수정' : '생성'}
+      />
+    </>
   );
 };
 

@@ -1,11 +1,11 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { signOut } from '@/features/auth/actions/sign-out';
 import { accountPasswordPath, accountProfilePath } from '@/paths';
@@ -20,7 +20,7 @@ type AccountDropdownProps = {
 const AccountDropdown = ({ user }: AccountDropdownProps) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="cursor-pointer">
+      <DropdownMenuTrigger asChild className="cursor-pointer">
         <Avatar>
           <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
         </Avatar>
@@ -28,13 +28,13 @@ const AccountDropdown = ({ user }: AccountDropdownProps) => {
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>내 계정</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href={accountProfilePath()} className="flex">
             <LucideUser className="mr-2 h-4 w-4" />
             <span>계정</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href={accountPasswordPath()} className="flex">
             <LucideLock className="mr-2 h-4 w-4" />
             <span>비밀번호</span>
@@ -42,7 +42,7 @@ const AccountDropdown = ({ user }: AccountDropdownProps) => {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <form action={signOut} className="flex">
             <LucideLogOut className="mr-2 h-4 w-4" />
             <button type="submit">로그아웃</button>

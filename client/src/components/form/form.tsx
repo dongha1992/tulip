@@ -6,6 +6,7 @@ type FormProps = {
   action: (payload: FormData) => void;
   actionState: ActionState;
   children: React.ReactNode;
+  id?: string;
   onSuccess?: (actionState: ActionState) => void;
   onError?: (actionState: ActionState) => void;
   toastOptions?: Omit<ToastT, 'id'> | undefined;
@@ -15,6 +16,7 @@ const Form = ({
   action,
   actionState,
   children,
+  id,
   onSuccess,
   onError,
   toastOptions,
@@ -36,7 +38,7 @@ const Form = ({
     },
   });
   return (
-    <form action={action} className="flex flex-col gap-y-2">
+    <form action={action} id={id} className="flex flex-col gap-y-2">
       {children}
     </form>
   );

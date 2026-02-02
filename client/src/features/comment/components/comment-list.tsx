@@ -32,7 +32,7 @@ const CommentList = ({
 
         if (comment.attachments.length) {
           sections.push({
-            label: 'Attachments',
+            label: '',
             content: (
               <AttachmentList
                 attachments={comment.attachments}

@@ -19,9 +19,7 @@ const CommentItem = ({ comment, sections, buttons }: CommentItemProps) => {
       <Card className="p-4 flex-1 flex flex-col gap-y-1">
         <div className="flex justify-between">
           <p className="text-sm text-muted-foreground">
-            {comment.isOwner
-              ? 'You'
-              : (comment.user?.username ?? 'Deleted User')}
+            {comment.user?.username ?? '탈퇴한 회원'}
           </p>
           <p className="text-sm text-muted-foreground">
             {format(comment.createdAt, 'yyyy-MM-dd, HH:mm')}
@@ -31,13 +29,10 @@ const CommentItem = ({ comment, sections, buttons }: CommentItemProps) => {
         {sections.map((section) => (
           <div key={section.label} className="space-y-2 mt-2">
             <Separator />
-
             <h4 className="text-sm text-muted-foreground">{section.label}</h4>
-
             <div>{section.content}</div>
           </div>
         ))}
-
         <div className="flex flex-col gap-y-1">{buttons}</div>
       </Card>
     </div>

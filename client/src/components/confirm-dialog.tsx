@@ -1,20 +1,20 @@
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-    cloneElement,
-    useActionState,
-    useEffect,
-    useRef,
-    useState,
-    type ReactElement,
+  cloneElement,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  type ReactElement,
 } from 'react';
 import { toast } from 'sonner';
 import { useActionFeedback } from './form/hooks/use-action-feedback';
@@ -30,8 +30,8 @@ type UseConfirmDialogArgs = {
 };
 
 const useConfirmDialog = ({
-  title = 'Are you absolutely sure?',
-  description = 'This action cannot be undone. Make sure you understand the consequences.',
+  title = '정말 삭제하시겠습니까?',
+  description = '',
   action,
   trigger,
   onSuccess,
@@ -57,7 +57,7 @@ const useConfirmDialog = ({
 
   useEffect(() => {
     if (isPending) {
-      toastRef.current = toast.loading('Deleting ...');
+      toastRef.current = toast.loading('삭제중 ...');
     } else if (toastRef.current) {
       toast.dismiss(toastRef.current);
     }
@@ -91,10 +91,10 @@ const useConfirmDialog = ({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>취소</AlertDialogCancel>
           <AlertDialogAction asChild>
             <form action={formAction}>
-              <Button type="submit">Confirm</Button>
+              <Button type="submit">확인</Button>
             </form>
           </AlertDialogAction>
         </AlertDialogFooter>

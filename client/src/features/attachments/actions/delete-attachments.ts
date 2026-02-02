@@ -14,7 +14,7 @@ export const deleteAttachment = async (id: string) => {
   const { user } = await getAuthOrRedirect();
 
   const attachment = await attachmentData.getAttachment(id);
-
+  console.log(attachment, '--');
   let subject;
   switch (attachment?.entity) {
     case 'TRADING':

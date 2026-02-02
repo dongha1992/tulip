@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { Slot } from '@radix-ui/react-slot';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { createContext, forwardRef, useContext } from 'react';
 
@@ -50,14 +51,17 @@ BreadcrumbItem.displayName = 'BreadcrumbItem';
 
 const BreadcrumbLink = forwardRef<
   HTMLAnchorElement,
-  ComponentPropsWithoutRef<'a'>
->(({ className, ...props }, ref) => (
-  <a
-    ref={ref}
-    className={cn('transition-colors hover:text-foreground', className)}
-    {...props}
-  />
-));
+  ComponentPropsWithoutRef<'a'> & { asChild?: boolean }
+>(({ asChild, className, ...props }, ref) => {
+  const Comp = asChild ? Slot : 'a';
+  return (
+    <Comp
+      ref={ref}
+      className={cn('transition-colors hover:text-foreground', className)}
+      {...props}
+    />
+  );
+});
 BreadcrumbLink.displayName = 'BreadcrumbLink';
 
 const BreadcrumbPage = forwardRef<
