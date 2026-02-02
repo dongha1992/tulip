@@ -1,6 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -71,6 +70,7 @@ const useConfirmDialog = ({
 
   useActionFeedback(actionState, {
     onSuccess: ({ actionState }) => {
+      setIsOpen(false);
       if (actionState.message) {
         toast.success(actionState.message);
       }
@@ -92,11 +92,9 @@ const useConfirmDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <form action={formAction}>
-              <Button type="submit">확인</Button>
-            </form>
-          </AlertDialogAction>
+          <form action={formAction}>
+            <Button type="submit">확인</Button>
+          </form>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

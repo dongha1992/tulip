@@ -12,6 +12,8 @@ type SubmitButtonProps = {
   variant?: ButtonProps['variant'];
   size?: ButtonProps['size'];
   form?: string;
+  /** form 바깥에 있을 때 useFormStatus가 동작하지 않으므로 isPending 전달 */
+  pending?: boolean;
 };
 
 const SubmitButton = ({
@@ -21,8 +23,10 @@ const SubmitButton = ({
   variant = 'default',
   size = 'default',
   form,
+  pending: pendingProp,
 }: SubmitButtonProps) => {
-  const { pending } = useFormStatus();
+  const { pending: pendingFromStatus } = useFormStatus();
+  const pending = pendingProp ?? pendingFromStatus;
 
   return (
     <Button

@@ -20,6 +20,10 @@ const Attachments = async ({
 }: AttachmentsProps) => {
   const attachments = await getAttachments(entityId, entity);
 
+  if (attachments.length === 0) {
+    return null;
+  }
+
   return (
     <CardCompact
       title=""
@@ -30,7 +34,12 @@ const Attachments = async ({
             attachments={attachments}
             buttons={(attachmentId: string) => [
               ...(isOwner
-                ? [<AttachmentDeleteButton key="0" id={attachmentId} />]
+                ? [
+                    <AttachmentDeleteButton
+                      key={attachmentId}
+                      id={attachmentId}
+                    />,
+                  ]
                 : []),
             ]}
           />

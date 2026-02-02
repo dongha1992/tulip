@@ -8,16 +8,15 @@ import { FieldError } from '@/components/form/field-error';
 import { Form } from '@/components/form/form';
 import { SubmitButton } from '@/components/form/submit-button';
 import { EMPTY_ACTION_STATE } from '@/components/form/utils/to-action-state';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { UploadFileInput } from '@/components/upload-file-input';
-import { AttachmentCreateForm } from '@/features/attachments/components/attachment-create-form';
-import { AttachmentDeleteButton } from '@/features/attachments/components/attachment-delete-button';
 import { AttachmentList } from '@/features/attachments/components/attachment-list';
 import type { Attachment, Trading } from '@prisma/client';
-import { useRouter } from 'next/navigation';
-import { useActionState, useRef } from 'react';
+import { LucideTrash } from 'lucide-react';
+import { useActionState, useRef, useState } from 'react';
 import { upsertTrading } from '../actions/upsert-trading';
 
 type TradingUpsertFormProps = {
@@ -29,10 +28,16 @@ const TradingUpsertForm = ({
   trading,
   attachments = [],
 }: TradingUpsertFormProps) => {
-  const router = useRouter();
-  const [actionState, action] = useActionState(
+  const [actionState, action, isPending] = useActionState(
     upsertTrading.bind(null, trading?.id),
     EMPTY_ACTION_STATE,
+  );
+
+  const [attachmentIdsToDelete, setAttachmentIdsToDelete] = useState<string[]>(
+    [],
+  );
+  const visibleAttachments = attachments.filter(
+    (a) => !attachmentIdsToDelete.includes(a.id),
   );
 
   const datePickerImperativeHandleRef =
@@ -102,34 +107,40 @@ const TradingUpsertForm = ({
 
         <div className="space-y-2">
           <Label htmlFor="files">첨부파일</Label>
-          {trading?.id ? (
-            attachments.length > 0 && (
-              <AttachmentList
-                attachments={attachments}
-                buttons={(attachmentId) => [
-                  <AttachmentDeleteButton
-                    key={attachmentId}
-                    id={attachmentId}
-                  />,
-                ]}
-              />
-            )
-          ) : (
-            <UploadFileInput id="files" name="files" />
+          {trading?.id && attachments.length > 0 && (
+            <AttachmentList
+              attachments={visibleAttachments}
+              buttons={(attachmentId) => [
+                <Button
+                  key={attachmentId}
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={() =>
+                    setAttachmentIdsToDelete((prev) => [...prev, attachmentId])
+                  }
+                >
+                  <LucideTrash className="h-4 w-4" />
+                </Button>,
+              ]}
+            />
           )}
+          {attachmentIdsToDelete.map((id) => (
+            <input
+              key={id}
+              type="hidden"
+              name="deletedAttachmentIds"
+              value={id}
+            />
+          ))}
+          <UploadFileInput id="files" name="files" />
         </div>
       </Form>
-      {trading?.id && (
-        <AttachmentCreateForm
-          entityId={trading.id}
-          entity="TRADING"
-          onSuccess={() => router.refresh()}
-        />
-      )}
       <SubmitButton
         className="w-full max-w-[420px] mt-2"
         form="trading-form"
         label={trading ? '수정' : '생성'}
+        pending={isPending}
       />
     </>
   );

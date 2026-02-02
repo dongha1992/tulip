@@ -63,14 +63,26 @@ export const upsertTrading = async (
 
     if (!id) {
       createdId = result.id;
-      if (formData.getAll('files').length > 0) {
-        console.log('here');
-        await createAttachments(
-          { entityId: result.id, entity: 'TRADING' },
-          EMPTY_ACTION_STATE,
-          formData,
-        );
+    }
+
+    if (id) {
+      const deletedIds = formData.getAll('deletedAttachmentIds') as string[];
+      if (deletedIds.length > 0) {
+        await prisma.attachment.deleteMany({
+          where: {
+            id: { in: deletedIds },
+            tradingId: id,
+          },
+        });
       }
+    }
+
+    if (formData.getAll('files').length > 0) {
+      await createAttachments(
+        { entityId: result.id, entity: 'TRADING' },
+        EMPTY_ACTION_STATE,
+        formData,
+      );
     }
   } catch (error) {
     return fromErrorToActionState(error, formData);
