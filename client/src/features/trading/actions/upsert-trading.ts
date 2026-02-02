@@ -17,10 +17,12 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const upsertTradingSchema = z.object({
-  title: z.string().min(1).max(191),
-  content: z.string().min(1).max(1024),
-  deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Is required'),
-  buy: z.coerce.number().positive(),
+  title: z.string().min(1).max(191, { message: '제목 길이가 너무 깁니다.' }),
+  content: z.string().min(1).max(1024, { message: '내용 길이가 너무 깁니다.' }),
+  deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+    message: '날짜 형식이 올바르지 않습니다.',
+  }),
+  buy: z.coerce.number().positive({ message: '구매 가격은 양수여야 합니다.' }),
 });
 
 export const upsertTrading = async (
@@ -39,7 +41,7 @@ export const upsertTrading = async (
       });
 
       if (!trading || !isOwner(user, trading)) {
-        return toActionState('ERROR', 'Not authorized');
+        return toActionState('ERROR', '권한이 없습니다.');
       }
     }
 
@@ -90,12 +92,12 @@ export const upsertTrading = async (
 
   revalidatePath(tradingsPath());
 
+  if (!createdId) throw new Error('ID가 없습니다.');
+
   if (id) {
     await setCookieByKey('toast', '수정되었습니다.');
     redirect(tradingPath(id));
   }
-
-  if (!createdId) throw new Error('ID가 없습니다.');
 
   await setCookieByKey('toast', '생성되었습니다.');
   redirect(tradingPath(createdId));

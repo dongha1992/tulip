@@ -7,10 +7,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { signOut } from '@/features/auth/actions/sign-out';
+import { SignOutMenuItem } from '@/features/auth/components/sign-out-client-wrapper';
 import { accountPasswordPath, accountProfilePath } from '@/paths';
 import { User } from '@prisma/client';
-import { LucideLock, LucideLogOut, LucideUser } from 'lucide-react';
+import { LucideLock, LucideUser } from 'lucide-react';
 import Link from 'next/link';
 
 type AccountDropdownProps = {
@@ -42,12 +42,7 @@ const AccountDropdown = ({ user }: AccountDropdownProps) => {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <form action={signOut} className="flex">
-            <LucideLogOut className="mr-2 h-4 w-4" />
-            <button type="submit">로그아웃</button>
-          </form>
-        </DropdownMenuItem>
+        <SignOutMenuItem />
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -29,7 +29,6 @@ const AttachmentDeleteButton = ({
       </Button>
     ),
     onSuccess: () => {
-      console.log('onSuccess');
       onDeleteAttachment?.(id);
       router.refresh();
     },

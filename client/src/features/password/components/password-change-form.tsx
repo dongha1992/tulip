@@ -19,7 +19,7 @@ const PasswordChangeForm = () => {
       <Input
         type="password"
         name="password"
-        placeholder="Password"
+        placeholder="비밀번호"
         defaultValue={actionState.payload?.get('password') as string}
       />
       <FieldError actionState={actionState} name="password" />

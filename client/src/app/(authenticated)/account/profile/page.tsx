@@ -4,11 +4,7 @@ import { AccountTabs } from '../_navigation/tabs';
 const ProfilePage = () => {
   return (
     <div className="flex-1 flex flex-col gap-y-8">
-      <Heading
-        title="Profile"
-        description="All your profile information"
-        tabs={<AccountTabs />}
-      />
+      <Heading title="내 계정" description="" tabs={<AccountTabs />} />
     </div>
   );
 };

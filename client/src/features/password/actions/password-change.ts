@@ -42,5 +42,6 @@ export const passwordChange = async (
   } catch (error) {
     return fromErrorToActionState(error, formData);
   }
-  return toActionState('SUCCESS', '비밀번호가 변경되었습니다.');
+  return toActionState('SUCCESS', '현재 해당 기능은 개발 중입니다.');
+  // return toActionState('SUCCESS', '비밀번호가 변경되었습니다.');
 };

@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
@@ -6,6 +7,7 @@ import { Header } from './_navigation/header';
 import { Sidebar } from './_navigation/sidebar/components/sidebar';
 import { ReactQueryProvider } from './_provider/react-query-provider';
 import './global.css';
+
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -36,13 +38,15 @@ export default function RootLayout({
       >
         <NuqsAdapter>
           <ReactQueryProvider>
-            <Header />
-            <div className="flex h-screen">
-              <Sidebar />
-              <main className="flex flex-1 min-h-screen flex-col py-24 px-8 bg-secondary/20">
-                {children}
-              </main>
-            </div>
+            <ThemeProvider>
+              <Header />
+              <div className="flex h-screen">
+                <Sidebar />
+                <main className="flex flex-1 min-h-screen flex-col py-24 px-8 bg-secondary/20">
+                  {children}
+                </main>
+              </div>
+            </ThemeProvider>
             <Toaster expand />
           </ReactQueryProvider>
         </NuqsAdapter>

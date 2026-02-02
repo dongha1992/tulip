@@ -1,5 +1,6 @@
 'use client';
 
+import { ThemeSwitcher } from '@/components/theme/theme-switcher';
 import { buttonVariants } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { homePath, signInPath, signUpPath } from '@/paths';
@@ -22,13 +23,13 @@ const Header = () => {
         href={signUpPath()}
         className={buttonVariants({ variant: 'outline' })}
       >
-        Sign Up
+        회원가입
       </Link>
       <Link
         href={signInPath()}
         className={buttonVariants({ variant: 'default' })}
       >
-        Sign In
+        로그인
       </Link>
     </>
   );
@@ -52,7 +53,7 @@ const Header = () => {
         </Link>
       </div>
       <div className="flex align-items gap-x-2">
-        {/* <ThemeSwitcher /> */}
+        <ThemeSwitcher />
         {navItems}
       </div>
     </nav>

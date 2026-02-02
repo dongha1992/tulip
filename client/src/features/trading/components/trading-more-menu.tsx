@@ -28,7 +28,7 @@ function TradingMoreMenu({ trading, trigger }: TradingMoreMenuProps) {
     trigger: (
       <DropdownMenuItem disabled={!trading.permissions.canDeleteTrading}>
         <LucideTrash className="h-4 w-4" />
-        <span>Delete</span>
+        <span>삭제</span>
       </DropdownMenuItem>
     ),
   });
@@ -37,7 +37,7 @@ function TradingMoreMenu({ trading, trigger }: TradingMoreMenuProps) {
     const promise = updateTradingStatus(trading.id, value as TradingStatus);
 
     toast.promise(promise, {
-      loading: 'Updating status...',
+      loading: '상태 업데이트 중...',
     });
 
     const result = await promise;

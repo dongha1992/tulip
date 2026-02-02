@@ -17,7 +17,10 @@ import { z } from 'zod';
 import * as commentData from '../data';
 
 const createCommentSchema = z.object({
-  content: z.string().min(1).max(1024),
+  content: z
+    .string()
+    .min(1, { message: '댓글을 입력해주세요.' })
+    .max(1024, { message: '댓글 내용은 1024자 이하여야 합니다.' }),
   files: filesSchema,
 });
 

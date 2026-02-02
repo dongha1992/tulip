@@ -13,17 +13,17 @@ export const SORT_OPTIONS = [
   {
     sortKey: 'createdAt',
     sortValue: 'desc',
-    label: 'Newest',
+    label: '최신순',
   },
   {
     sortKey: 'createdAt',
     sortValue: 'asc',
-    label: 'Oldest',
+    label: '오래된순',
   },
   {
     sortKey: 'buy',
     sortValue: 'desc',
-    label: 'Buy',
+    label: '구매가격 높은순',
   },
 ];
 

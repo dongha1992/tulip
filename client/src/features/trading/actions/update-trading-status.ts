@@ -11,6 +11,7 @@ import { tradingsPath } from '@/paths';
 import { TradingStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
+// TODO: 낙관적 업데이트 적용
 export const updateTradingStatus = async (
   id: string,
   status: TradingStatus,

@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { Input } from "./ui/input";
+import { debounce } from '@/lib/utils';
+import { Input } from './ui/input';
 
 type SearchInputProps = {
   value: string;
@@ -8,12 +9,13 @@ type SearchInputProps = {
   placeholder: string;
 };
 
-// TODO: 디바운스 구현
 const SearchInput = ({ value, onChange, placeholder }: SearchInputProps) => {
-  const handleSearch = 
+  const handleSearch = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange(event.target.value);
-    }
+    },
+    250,
+  );
 
   return (
     <Input

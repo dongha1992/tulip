@@ -93,7 +93,9 @@ const useConfirmDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
           <form action={formAction}>
-            <Button type="submit">확인</Button>
+            <Button type="submit" disabled={isPending}>
+              확인
+            </Button>
           </form>
         </AlertDialogFooter>
       </AlertDialogContent>

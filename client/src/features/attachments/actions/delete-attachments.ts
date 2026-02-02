@@ -12,9 +12,9 @@ import * as attachmentSubjectDTO from '../dto/attachment-subject-dto';
 
 export const deleteAttachment = async (id: string) => {
   const { user } = await getAuthOrRedirect();
-  console.log(id, 'deleteAttachment id');
+
   const attachment = await attachmentData.getAttachment(id);
-  console.log(attachment, '--');
+
   let subject;
   switch (attachment?.entity) {
     case 'TRADING':

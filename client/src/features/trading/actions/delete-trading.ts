@@ -23,7 +23,7 @@ export const deleteTrading = async (id: string) => {
     });
 
     if (!trading || !isOwner(user, trading)) {
-      return toActionState('ERROR', 'Not authorized');
+      return toActionState('ERROR', '권한이 없습니다.');
     }
 
     await prisma.trading.delete({

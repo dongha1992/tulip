@@ -12,11 +12,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { UploadFileInput } from '@/components/upload-file-input';
+import {
+  UploadFileInput,
+  type UploadFileInputRef,
+} from '@/components/upload-file-input';
 import { AttachmentList } from '@/features/attachments/components/attachment-list';
 import type { Attachment, Trading } from '@prisma/client';
 import { LucideTrash } from 'lucide-react';
-import { useActionState, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { upsertTrading } from '../actions/upsert-trading';
 
 type TradingUpsertFormProps = {
@@ -28,6 +31,7 @@ const TradingUpsertForm = ({
   trading,
   attachments = [],
 }: TradingUpsertFormProps) => {
+  const fileInputRef = useRef<UploadFileInputRef>(null);
   const [actionState, action, isPending] = useActionState(
     upsertTrading.bind(null, trading?.id),
     EMPTY_ACTION_STATE,
@@ -46,6 +50,12 @@ const TradingUpsertForm = ({
   const handleSuccess = () => {
     datePickerImperativeHandleRef.current?.reset();
   };
+
+  useEffect(() => {
+    if (actionState.status === 'ERROR') {
+      fileInputRef.current?.reset();
+    }
+  }, [actionState.status]);
 
   return (
     <>
@@ -133,13 +143,13 @@ const TradingUpsertForm = ({
               value={id}
             />
           ))}
-          <UploadFileInput id="files" name="files" />
+          <UploadFileInput ref={fileInputRef} id="files" name="files" />
         </div>
       </Form>
       <SubmitButton
         className="w-full max-w-[420px] mt-2"
         form="trading-form"
-        label={trading ? '수정' : '생성'}
+        label={trading ? '수정하기' : '만들기'}
         pending={isPending}
       />
     </>
