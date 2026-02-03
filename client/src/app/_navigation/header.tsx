@@ -4,7 +4,7 @@ import { ThemeSwitcher } from '@/components/theme/theme-switcher';
 import { buttonVariants } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { homePath, signInPath, signUpPath } from '@/paths';
-import { LucideKanban } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { AccountDropdown } from './account-dropdown';
 
@@ -44,12 +44,15 @@ const Header = () => {
         "
     >
       <div className="flex align-items gap-x-2">
-        <Link
-          href={homePath()}
-          className={buttonVariants({ variant: 'ghost' })}
-        >
-          <LucideKanban />
-          <h1 className="text-lg font-semibold">홈</h1>
+        <Link href={homePath()}>
+          <Image
+            src="/img/logo.png"
+            alt="logo"
+            width={120}
+            height={40}
+            className="h-12 w-auto"
+            priority
+          />
         </Link>
       </div>
       <div className="flex align-items gap-x-2">

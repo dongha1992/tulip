@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   title: '튤립',
   description:
     'I can calculate the motion of heavenly bodies, but not the madness of men.',
+  icons: {
+    icon: '/img/logo_icon.png',
+  },
 };
 
 export default function RootLayout({
