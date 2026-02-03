@@ -15,7 +15,7 @@ const ReferencedTradings = async ({ tradingId }: ReferencedTradingsProps) => {
 
   return (
     <CardCompact
-      title="언급된 매매 기록"
+      title="언급된 매매"
       description=""
       content={
         <div className="mx-2 mb-4">

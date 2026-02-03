@@ -29,7 +29,7 @@ function linkifyText(text: string) {
 
     const handleClick = (event: React.MouseEvent) => {
       if (isInternal) return;
-      if (!confirm('Are you sure you want to leave this page?')) {
+      if (!confirm('정말 이 페이지를 떠나시겠습니까?')) {
         event.preventDefault();
       }
     };
