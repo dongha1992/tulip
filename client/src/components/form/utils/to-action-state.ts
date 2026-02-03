@@ -1,6 +1,6 @@
 import { ZodError } from 'zod';
 
-export type ActionState<T = any> = {
+export type ActionState<T = unknown> = {
   status?: 'SUCCESS' | 'ERROR';
   message: string;
   payload?: FormData;
@@ -24,7 +24,7 @@ export const fromErrorToActionState = (
       status: 'ERROR',
       message: '',
       payload: formData,
-      fieldErrors: error.flatten().fieldErrors,
+      fieldErrors: error.flatten().fieldErrors as Record<string, string[]>,
       timestamp: Date.now(),
     };
   } else if (error instanceof Error) {

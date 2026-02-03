@@ -19,7 +19,7 @@ const AttachmentsClientWrapper = ({
     (state, idToRemove: string) => state.filter((a) => a.id !== idToRemove),
   );
 
-  const [_, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   return (
     <AttachmentList

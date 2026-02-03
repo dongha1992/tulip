@@ -31,11 +31,9 @@ const CommentCreateForm = ({
   );
   const uploadFileInputRef = useRef<UploadFileInputRef>(null);
 
-  const handleSuccess = (
-    actionState: ActionState<CommentWithMetadata | undefined>,
-  ) => {
+  const handleSuccess = (actionState: ActionState) => {
     uploadFileInputRef.current?.reset();
-    onCreateComment?.(actionState.data);
+    onCreateComment?.(actionState.data as CommentWithMetadata | undefined);
   };
 
   return (

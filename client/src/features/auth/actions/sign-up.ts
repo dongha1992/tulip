@@ -1,9 +1,9 @@
 'use server';
 
 import {
-    ActionState,
-    fromErrorToActionState,
-    toActionState,
+  ActionState,
+  fromErrorToActionState,
+  toActionState,
 } from '@/components/form/utils/to-action-state';
 import { hashPassword } from '@/features/password/utils/hash-and-verify';
 import { prisma } from '@/lib/prisma';

@@ -7,10 +7,7 @@ import { LucideLoaderCircle, LucideLogOut } from 'lucide-react';
 import { useActionState } from 'react';
 
 const SignOutMenuItem = () => {
-  const [_, formAction, isPending] = useActionState(
-    signOut,
-    EMPTY_ACTION_STATE,
-  );
+  const [, formAction, isPending] = useActionState(signOut, EMPTY_ACTION_STATE);
 
   return (
     <DropdownMenuItem

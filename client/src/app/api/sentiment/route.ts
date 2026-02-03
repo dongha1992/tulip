@@ -1,12 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const response = await axios.post('http://127.0.0.1:8000/scrape');
     const { feeds: stockFeeds } = response.data;
 
-    const texts = stockFeeds.map((feed) => feed.text).filter(Boolean);
+    const texts = stockFeeds
+      .map((feed: unknown) => (feed as { text: string }).text)
+      .filter(Boolean);
 
     const sentimentResponse = await axios.post(
       'http://127.0.0.1:8000/analyze',
@@ -15,18 +17,25 @@ export async function GET(req: NextRequest) {
       },
     );
 
-    const koreanResults = sentimentResponse.data.map((result) => ({
-      sentiment_score: result.score.toFixed(2),
-      positive_percent: result.score.toFixed(2),
-      negative_percent: (100 - result.score).toFixed(2),
-      detailed_sentiment: result.label,
-      confidence: result.confidence,
-      overall_sentiment: result.label,
-      class_probabilities: result.class_probabilities,
-      sentiment_strength: getSentimentStrength(result.score),
-    }));
+    const koreanResults = sentimentResponse.data.map(
+      (result: {
+        score: number;
+        label: string;
+        confidence: number;
+        class_probabilities: { [key: string]: number };
+      }) => ({
+        sentiment_score: result.score.toFixed(2),
+        positive_percent: result.score.toFixed(2),
+        negative_percent: (100 - result.score).toFixed(2),
+        detailed_sentiment: result.label,
+        confidence: result.confidence,
+        overall_sentiment: result.label,
+        class_probabilities: result.class_probabilities,
+        sentiment_strength: getSentimentStrength(result.score),
+      }),
+    );
 
-    const sentimentResults = texts.map((text, index) => ({
+    const sentimentResults = texts.map((text: string, index: number) => ({
       text,
       korean_sentiment: koreanResults[index],
     }));
@@ -60,15 +69,31 @@ function getSentimentStrength(score: number): string {
   return '매우 약함';
 }
 
-function determineOverallSentiment(results) {
-  const sentimentCounts = results.reduce((acc, result) => {
-    acc[result.detailed_sentiment] = (acc[result.detailed_sentiment] || 0) + 1;
-    return acc;
-  }, {});
+function determineOverallSentiment(
+  results: {
+    sentiment_score: string;
+    detailed_sentiment: string;
+    confidence: number;
+    class_probabilities: {
+      [key: string]: number;
+    };
+  }[],
+) {
+  const sentimentCounts = results.reduce(
+    (
+      acc: { [key: string]: number },
+      result: { detailed_sentiment: string },
+    ) => {
+      acc[result.detailed_sentiment] =
+        (acc[result.detailed_sentiment] || 0) + 1;
+      return acc;
+    },
+    {},
+  );
 
   const totalCount = results.length;
   const sentimentPercentages = Object.entries(sentimentCounts).map(
-    ([sentiment, count]) => ({
+    ([sentiment, count]: [string, number]) => ({
       sentiment,
       percentage: ((count / totalCount) * 100).toFixed(2),
       count,
@@ -77,14 +102,23 @@ function determineOverallSentiment(results) {
 
   const averageScore =
     results.reduce(
-      (sum, result) => sum + parseFloat(result.sentiment_score),
+      (sum: number, result: { sentiment_score: string }) =>
+        sum + parseFloat(result.sentiment_score),
       0,
     ) / totalCount;
 
-  const dominantSentiment = sentimentPercentages.reduce((max, sentiment) =>
-    parseFloat(sentiment.percentage) > parseFloat(max.percentage)
-      ? sentiment
-      : max,
+  const dominantSentiment = sentimentPercentages.reduce(
+    (
+      max: { percentage: string; sentiment: string; count: number },
+      sentiment: { percentage: string },
+    ): { percentage: string; sentiment: string; count: number } =>
+      parseFloat(sentiment.percentage) > parseFloat(max.percentage)
+        ? {
+            percentage: sentiment.percentage,
+            sentiment: max.sentiment as string,
+            count: max.count as number,
+          }
+        : max,
   );
 
   return {

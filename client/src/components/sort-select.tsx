@@ -1,17 +1,12 @@
-"use client";
+'use client';
 
-import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-} from "./ui/select";
+import { Select, SelectItem, SelectTrigger } from './ui/select';
 
 export type SortSelectOption = {
   sortKey: string;
   sortValue: string;
   label: string;
 };
-
 
 type SortObject = {
   sortKey: string;
@@ -24,33 +19,33 @@ type SortSelectProps = {
   options: SortSelectOption[];
 };
 
-const SortSelect = ({ value, onChange, options }: SortSelectProps) => { 
-    const handleSort = (compositeKey: string) => {
-    const [sortKey, sortValue] = compositeKey.split("_");
+const SortSelect = ({ value, onChange, options }: SortSelectProps) => {
+  const handleSort = (compositeKey: string) => {
+    const [sortKey, sortValue] = compositeKey.split('_');
 
     onChange({
       sortKey,
       sortValue,
-      });
-    };
-    
-     return (
+    });
+  };
+
+  return (
     <Select
       onValueChange={handleSort}
-      defaultValue={value.sortKey + "_" + value.sortValue}
+      defaultValue={value.sortKey + '_' + value.sortValue}
     >
       <SelectTrigger>
         {options.map((option) => (
           <SelectItem
             key={option.sortKey + option.sortValue}
-            value={option.sortKey + "_" + option.sortValue}
+            value={option.sortKey + '_' + option.sortValue}
           >
             {option.label}
           </SelectItem>
         ))}
       </SelectTrigger>
     </Select>
-     )
-}
+  );
+};
 
 export { SortSelect };

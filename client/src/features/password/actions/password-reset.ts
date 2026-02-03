@@ -1,8 +1,8 @@
 import { setCookieByKey } from '@/actions/cookies';
 import {
-    ActionState,
-    fromErrorToActionState,
-    toActionState,
+  ActionState,
+  fromErrorToActionState,
+  toActionState,
 } from '@/components/form/utils/to-action-state';
 import { prisma } from '@/lib/prisma';
 import { signInPath } from '@/paths';

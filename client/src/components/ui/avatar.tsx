@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import {
-    createContext,
-    forwardRef,
-    useContext,
-    useState,
-    type HTMLAttributes,
-    type ImgHTMLAttributes,
+  createContext,
+  forwardRef,
+  useContext,
+  useState,
+  type HTMLAttributes,
+  type ImgHTMLAttributes,
 } from 'react';
 
 type AvatarContextValue = {

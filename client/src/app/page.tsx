@@ -1,10 +1,4 @@
-import { SearchParams } from 'nuqs/server';
-
-type HomePageProps = {
-  searchParams: Promise<SearchParams>;
-};
-
-export default function Home({ searchParams }: HomePageProps) {
+export default function Home() {
   // useEffect(() => {
   //   const getScraper = async () => {
   //     const data = await axios.post('http://127.0.0.1:8000/scrape');

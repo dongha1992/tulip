@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable prettier/prettier */
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -23,17 +24,23 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 
-type SlotProps = { children: ReactElement; [key: string]: any };
+type SlotProps = { children: ReactElement; [key: string]: unknown };
 function Slot({ children, ...props }: SlotProps) {
-  return cloneElement(children, {
-    ...props,
-    ...children.props,
-    className: cn(props.className, children.props.className),
-    onClick: (...args: any[]) => {
-      props.onClick?.(...args);
-      children.props.onClick?.(...args);
+  const merged: HTMLAttributes<HTMLElement> = {
+    ...(children.props as HTMLAttributes<HTMLElement>),
+    ...(props as HTMLAttributes<HTMLElement>),
+    className: cn(
+      (props as { className?: string }).className,
+      (children.props as { className?: string }).className,
+    ),
+    onClick: (...args: unknown[]) => {
+      (props as { onClick?: (...args: unknown[]) => void })?.onClick?.(...args);
+      (children.props as { onClick: (...args: unknown[]) => void }).onClick?.(
+        ...args,
+      );
     },
-  });
+  };
+  return cloneElement(children, merged);
 }
 
 type AlertDialogContext = {
