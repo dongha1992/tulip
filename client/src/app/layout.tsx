@@ -43,9 +43,9 @@ export default function RootLayout({
           <ReactQueryProvider>
             <ThemeProvider>
               <Header />
-              <div className="flex h-screen">
+              <div className="flex">
                 <Sidebar />
-                <main className="flex flex-1 min-h-screen flex-col py-24 px-8 bg-secondary/20">
+                <main className="flex flex-1 flex-col py-24 px-8 bg-secondary/20">
                   {children}
                 </main>
               </div>
