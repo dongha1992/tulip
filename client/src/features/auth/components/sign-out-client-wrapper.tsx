@@ -12,7 +12,7 @@ const SignOutMenuItem = () => {
   return (
     <DropdownMenuItem
       asChild
-      onSelect={(e: React.MouseEvent<HTMLButtonElement>) => {
+      onSelect={(e: Event) => {
         e.preventDefault();
       }}
     >
