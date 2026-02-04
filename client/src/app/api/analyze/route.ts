@@ -1,23 +1,86 @@
-import axios from 'axios';
+import { checkRateLimit } from '@/utils/rate-limit';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+const CRAWLER_URL = process.env.CRAWLER_URL;
+const ANALYSIS_URL = process.env.ANALYSIS_URL;
+
+export async function POST(req: Request) {
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
-    const response = await axios.post('http://127.0.0.1:8000/scrape');
-    const { feeds: stockFeeds } = response.data;
+    const { stock_id } = await req.json();
+
+    if (!stock_id) {
+      return NextResponse.json(
+        { error: 'stock_id는 필수입니다.' },
+        { status: 400 },
+      );
+    }
+
+    if (!CRAWLER_URL || !ANALYSIS_URL) {
+      return NextResponse.json(
+        { error: 'CRAWLER_URL and ANALYSIS_URL must be configured' },
+        { status: 500 },
+      );
+    }
+
+    // 1. 크롤링
+    const crawlRes = await fetch(`${CRAWLER_URL}/crawl`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stock_id, max_scrolls: 5, save: true }),
+    });
+
+    if (!crawlRes.ok) {
+      const err = await crawlRes.text();
+      throw new Error(`Crawl failed: ${err}`);
+    }
+
+    const { feeds: stockFeeds } = await crawlRes.json();
+    console.log(stockFeeds);
 
     const texts = stockFeeds
       .map((feed: unknown) => (feed as { text: string }).text)
       .filter(Boolean);
 
-    const sentimentResponse = await axios.post(
-      'http://127.0.0.1:8000/analyze',
-      {
-        texts: texts,
-      },
-    );
+    if (texts.length === 0) {
+      return NextResponse.json({
+        status: 'success',
+        data: {
+          individual_results: [],
+          overall_sentiment: {
+            korean: {
+              dominant_sentiment: '중립',
+              average_score: '50.00',
+              sentiment_distribution: [],
+              overall_confidence: '낮음',
+              sentiment_strength: '보통',
+              total_analyzed: 0,
+            },
+          },
+        },
+      });
+    }
 
-    const koreanResults = sentimentResponse.data.map(
+    // 2. 감정 분석
+    const analysisRes = await fetch(`${ANALYSIS_URL}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texts }),
+    });
+
+    if (!analysisRes.ok) {
+      const err = await analysisRes.text();
+      throw new Error(`Analysis failed: ${err}`);
+    }
+
+    const sentimentResponse = await analysisRes.json();
+
+    const koreanResults = sentimentResponse.map(
       (result: {
         score: number;
         label: string;

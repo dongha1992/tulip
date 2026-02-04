@@ -7,6 +7,8 @@ declare global {
       AWS_BUCKET_NAME: string;
       AWS_REGION: string;
       STRIPE_SECRET_KEY: string;
+      CRAWLER_URL?: string;
+      ANALYSIS_URL?: string;
     }
   }
 }
