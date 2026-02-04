@@ -89,9 +89,12 @@ const TradingItem = ({
             {attachments}
           </CardContent>
 
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex flex-col gap-y-1 sm:flex-row sm:justify-between sm:items-center">
             <p className="text-sm text-muted-foreground">
               {trading.deadline} by {trading.user.username}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              매수가: ${trading.buy.toLocaleString()}
             </p>
           </CardFooter>
         </Card>

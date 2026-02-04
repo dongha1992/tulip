@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     // 1. 크롤링
-    const crawlRes = await fetch(`${CRAWLER_URL}/crawl`, {
+    const crawlRes = await fetch(`${CRAWLER_URL}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ stock_id, max_scrolls: 5, save: true }),
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     }
 
     // 2. 감정 분석
-    const analysisRes = await fetch(`${ANALYSIS_URL}/analyze`, {
+    const analysisRes = await fetch(`${ANALYSIS_URL}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ texts }),
