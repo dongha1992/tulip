@@ -1,6 +1,8 @@
-from playwright.async_api import async_playwright, Page
+from playwright.async_api import async_playwright
 from typing import List, Dict
 import asyncio
+import os
+import psycopg2 
 
 async def get_stock_feeds(max_scrolls: int = 5) -> List[Dict]:
     async with async_playwright() as p:
@@ -46,3 +48,27 @@ async def get_stock_feeds(max_scrolls: int = 5) -> List[Dict]:
 
         finally:
             await browser.close()
+
+def save_to_db(feeds: List[Dict]):
+    conn = psycopg2.connect(DATABASE_URL)
+    cursor = conn.cursor()
+    for feed in feeds:
+        cur.execute(
+            """
+            insert into stock_feeds (href, text, image_src)
+            values (%s, %s, %s)
+            on conflict (href) do nothing
+            """,
+            (feed["href"], feed["text"], feed["imageSrc"]),
+        )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+async def main():
+    feeds = await get_stock_feeds()
+    save_to_db(feeds)
+
+if __name__ == "__main__":
+    asyncio.run(main())
