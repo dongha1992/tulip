@@ -20,7 +20,13 @@ async def get_stock_feeds(stock_id: str, max_scrolls: int = 5) -> List[Dict]:
                 "--disable-setuid-sandbox",
                 "--disable-dev-shm-usage",
                 "--disable-gpu",
-                "--single-process",
+                "--disable-software-rasterizer",
+                "--disable-extensions",
+                "--no-first-run",
+                "--disable-background-networking",
+                "--disable-default-apps",
+                "--disable-sync",
+                "--mute-audio",
             ],
         )
         try:
