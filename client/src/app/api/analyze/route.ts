@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     }
 
     // 2. 감정 분석
-    const analysisRes = await fetch(`${ANALYSIS_BASE}/analyze`, {
+    const analysisRes = await fetch(`${ANALYSIS_BASE}/analysis`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ texts }),

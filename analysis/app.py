@@ -12,7 +12,7 @@ class SentimentRequest(BaseModel):
     texts: List[str]
 
 
-@app.post("/analyze")
+@app.post("/analysis")
 def analyze(request: SentimentRequest):
     return [analyzer.analyze_text(text) for text in request.texts]
 
