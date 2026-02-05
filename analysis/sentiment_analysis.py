@@ -42,10 +42,11 @@ class SentimentAnalyzer:
         }
 
         # 모델 초기화
-        self.tokenizer = AutoTokenizer.from_pretrained("beomi/kcbert-base")
+        self.tokenizer = AutoTokenizer.from_pretrained("beomi/kcbert-base", local_files_only=True)
         self.model = AutoModelForSequenceClassification.from_pretrained(
             "beomi/kcbert-base",
-            num_labels=5
+            num_labels=5,
+            local_files_only=True
         )
 
     def preprocess_text(self, text):
