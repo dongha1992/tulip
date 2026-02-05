@@ -1,8 +1,16 @@
 import { checkRateLimit } from '@/utils/rate-limit';
 import { NextResponse } from 'next/server';
 
-const CRAWLER_URL = process.env.CRAWLER_URL;
-const ANALYSIS_URL = process.env.ANALYSIS_URL;
+// TODO: 임시 로컬: http://127.0.0.1, 배포: Cloud Run URL
+const isDev = process.env.NODE_ENV === 'development';
+
+const CRAWLER_BASE =
+  process.env.CRAWLER_URL?.replace(/\/$/, '') ??
+  (isDev ? 'http://127.0.0.1:8080' : '');
+// 크롤러 8080, 분석 8081
+const ANALYSIS_BASE =
+  process.env.ANALYSIS_URL?.replace(/\/$/, '') ??
+  (isDev ? 'http://127.0.0.1:8081' : '');
 
 export async function POST(req: Request) {
   const ip =
@@ -21,7 +29,7 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!CRAWLER_URL || !ANALYSIS_URL) {
+    if (!CRAWLER_BASE || !ANALYSIS_BASE) {
       return NextResponse.json(
         { error: 'CRAWLER_URL and ANALYSIS_URL must be configured' },
         { status: 500 },
@@ -29,10 +37,12 @@ export async function POST(req: Request) {
     }
 
     // 1. 크롤링
-    const crawlRes = await fetch(`${CRAWLER_URL}`, {
+    const body = { stock_id, max_scrolls: 5, save: true };
+
+    const crawlRes = await fetch(`${CRAWLER_BASE}/crawl`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stock_id, max_scrolls: 5, save: true }),
+      body: JSON.stringify(body),
     });
 
     if (!crawlRes.ok) {
@@ -42,7 +52,6 @@ export async function POST(req: Request) {
 
     const { feeds: stockFeeds } = await crawlRes.json();
     console.log(stockFeeds);
-
     const texts = stockFeeds
       .map((feed: unknown) => (feed as { text: string }).text)
       .filter(Boolean);
@@ -67,7 +76,7 @@ export async function POST(req: Request) {
     }
 
     // 2. 감정 분석
-    const analysisRes = await fetch(`${ANALYSIS_URL}`, {
+    const analysisRes = await fetch(`${ANALYSIS_BASE}/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ texts }),

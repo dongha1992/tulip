@@ -1,5 +1,12 @@
+from pathlib import Path
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+
+# 로컬: crawler/.env 또는 프로젝트 루트 .env 로드
+load_dotenv(Path(__file__).resolve().parent / ".env")
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 from crawler import get_stock_feeds, save_to_db
 
