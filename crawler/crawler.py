@@ -12,7 +12,17 @@ async def get_stock_feeds(stock_id: str, max_scrolls: int = 5) -> List[Dict]:
     url = f"https://tossinvest.com/stocks/{stock_id}/community?feedSortType=RECENT"
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        # Cloud Run/Docker: --disable-dev-shm-usage 필수 (작은 /dev/shm)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--single-process",
+            ],
+        )
         try:
             page = await browser.new_page()
             await page.goto(url, wait_until='domcontentloaded', timeout=60000)
