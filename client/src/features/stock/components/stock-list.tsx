@@ -76,6 +76,7 @@ const StockList = async ({ searchParams }: StockListProps) => {
                 meta.stockCode,
               )}?${new URLSearchParams({
                 PRDT_TYPE_CD: mapExcdToProductTypeCode(rankingItem.excd),
+                EXCD: rankingItem.excd,
                 PDNO: rankingItem.symb,
               }).toString()}`}
               title={meta.name}
@@ -157,6 +158,7 @@ const StockList = async ({ searchParams }: StockListProps) => {
             firstMeta.stockCode,
           )}?${new URLSearchParams({
             PRDT_TYPE_CD: mapExcdToProductTypeCode(firstMeta.EXCD),
+            EXCD: firstMeta.EXCD,
             PDNO: firstMeta.ticker,
           }).toString()}`}
           title={firstMeta.name}

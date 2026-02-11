@@ -66,9 +66,7 @@ export function clearHantuTokenCache(): void {
 function wrapTokenFetchError(err: unknown): never {
   const msg = err instanceof Error ? err.message : String(err);
   if (msg.includes(HANTU_TOKEN_RATE_LIMIT_CODE)) {
-    throw new Error(
-      '토큰 발급 한도(1분당 1회)입니다. 1분 후 새로고침 해 주세요.',
-    );
+    console.error(err);
   }
   throw err;
 }
@@ -130,9 +128,7 @@ export async function withHantuToken<T>(
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes(HANTU_TOKEN_EXPIRED_CODE)) {
       clearHantuTokenCache();
-      throw new Error(
-        '접근 토큰이 만료되었습니다. 잠시 후 새로고침 해 주세요.',
-      );
+      console.error(err);
     }
     throw err;
   }

@@ -252,3 +252,26 @@ export type Growth5y =
   | { kind: 'cagr'; value: number }
   | { kind: 'turnaround'; label: string; year?: number }
   | { kind: 'na' };
+
+export type OwnershipRowKey = 'insiders' | 'institutions' | 'other';
+
+export type OwnershipRow = {
+  key: OwnershipRowKey;
+  label: string;
+  shares?: number; // 정수
+  pct?: number; // 0~1
+};
+
+export type OwnershipBreakdownDTO = {
+  asOf?: string; //
+  exchange?: string;
+  symbol?: string;
+
+  sharesOutstanding?: number;
+  normalizedInsidersPct?: number;
+  rows: OwnershipRow[];
+  debug?: {
+    rawInsidersPct?: unknown;
+    rawInstitutionsPct?: unknown;
+  };
+};

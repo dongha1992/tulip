@@ -261,7 +261,7 @@ export function computeFutureChecklistSimplyStyle(
   ];
 
   const score = items.reduce((s, it) => s + (it.pass ? 1 : 0), 0);
-  console.log(items, 'items');
+
   return {
     score,
     items,

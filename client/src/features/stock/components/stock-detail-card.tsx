@@ -1,33 +1,42 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type {
-  OverseasStockBasicInfoResponse,
-  StocksMetaInfoResponse,
-} from '@/features/stock/types';
+import type { StocksMetaInfoResponse } from '@/features/stock/types';
 import Image from 'next/image';
 import type { QuoteSummaryResult } from 'yahoo-finance2/modules/quoteSummary';
 import { buildSimplySummaryDTO } from '../dto/stock-info';
+import { buildOwnershipBreakdownDTO } from '../dto/stock-ownership';
 import { getCompanyFacts } from '../queries/get-company-facts';
 import { getSecCompanyTicker } from '../queries/get-sec-company-ticker';
 import { getYahooQuoteSummary } from '../queries/get-yahoo-stock-forecast';
 import type { CompanyFactsResponse, SecCompanyTickerMap } from '../types';
+import type { OptionsSnapshot } from '../utils/stock-options';
+import { buildOptionsSnapshot } from '../utils/stock-options';
+import { FinancialHealthCard } from './financial-health-card';
 import { FuturePerformanceCard } from './stock-future-performance';
+import { StockOptionsCard } from './stock-options-card';
+import { OwnershipCard } from './stock-ownership';
 import { PastPerformanceCard } from './stock-past-performance';
+import { StockShortInterestCard } from './stock-short-interest-card';
 
 type StockDetailCardProps = {
   meta: StocksMetaInfoResponse;
-  /** 주가 (현재가) */
-  price: number | null;
 
-  /** 시가총액 */
+  price: number | null;
   marketCap: number | null;
-  basicInfo: OverseasStockBasicInfoResponse['output'] | null;
+  excd: string | null;
+  pdno: string | null;
   tickerSymbol: string | null;
 };
 
+function formatUsd(value: number | null | undefined): string {
+  if (value == null || Number.isNaN(value)) return 'n/a';
+  return `$${Math.round(value).toLocaleString()}`;
+}
+
 const StockDetailCard = async ({
   meta,
-  basicInfo,
+  excd,
+  pdno,
   tickerSymbol,
   price,
   marketCap,
@@ -35,6 +44,9 @@ const StockDetailCard = async ({
   let dto: ReturnType<typeof buildSimplySummaryDTO> = null;
   let companyFacts: CompanyFactsResponse | null = null;
   let yahoo: QuoteSummaryResult | null = null;
+  let ownershipDto = null as ReturnType<
+    typeof buildOwnershipBreakdownDTO
+  > | null;
 
   if (tickerSymbol) {
     const secTickers = (await getSecCompanyTicker()) as SecCompanyTickerMap;
@@ -51,6 +63,7 @@ const StockDetailCard = async ({
     }
 
     yahoo = await getYahooQuoteSummary(tickerSymbol ?? '');
+    ownershipDto = buildOwnershipBreakdownDTO(yahoo);
   }
 
   if (!companyFacts) {
@@ -60,6 +73,9 @@ const StockDetailCard = async ({
   if (!yahoo) {
     return null;
   }
+
+  const optionsSnapshot: OptionsSnapshot | null =
+    (await buildOptionsSnapshot(tickerSymbol, yahoo)) ?? null;
 
   return (
     <Card className="mt-4">
@@ -79,7 +95,9 @@ const StockDetailCard = async ({
         )}
         <div>
           <CardTitle className="text-xl font-semibold">{meta.name}</CardTitle>
-          <p className="text-xs text-muted-foreground">{meta.stockCode}</p>
+          <p className="text-xs text-muted-foreground">
+            {tickerSymbol?.toUpperCase()}
+          </p>
         </div>
       </CardHeader>
 
@@ -97,7 +115,7 @@ const StockDetailCard = async ({
           <div className="text-sm text-muted-foreground">
             시가총액{' '}
             <span className="font-semibold text-foreground">
-              {marketCap.toLocaleString()}
+              {formatUsd(marketCap)}
             </span>
           </div>
         )}
@@ -122,22 +140,14 @@ const StockDetailCard = async ({
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="rounded-md bg-muted/40 p-2">
                   <p className="text-[11px] text-muted-foreground">TTM 매출</p>
-                  <p className="font-semibold">
-                    {dto.revenueTtm != null
-                      ? dto.revenueTtm.toLocaleString()
-                      : 'n/a'}
-                  </p>
+                  <p className="font-semibold">{formatUsd(dto.revenueTtm)}</p>
                 </div>
 
                 <div className="rounded-md bg-muted/40 p-2">
                   <p className="text-[11px] text-muted-foreground">
                     TTM 순이익
                   </p>
-                  <p className="font-semibold">
-                    {dto.netIncomeTtm != null
-                      ? dto.netIncomeTtm.toLocaleString()
-                      : 'n/a'}
-                  </p>
+                  <p className="font-semibold">{formatUsd(dto.netIncomeTtm)}</p>
                 </div>
 
                 <div className="rounded-md bg-muted/40 p-2">
@@ -181,6 +191,19 @@ const StockDetailCard = async ({
         </Card>
         <PastPerformanceCard facts={companyFacts} showDetail={false} />
         <FuturePerformanceCard facts={companyFacts} yahoo={yahoo} />
+        {ownershipDto && <OwnershipCard dto={ownershipDto} showDetail />}
+        <FinancialHealthCard
+          facts={companyFacts}
+          yahoo={yahoo}
+          showDetail={false}
+        />
+        <StockOptionsCard
+          spot={optionsSnapshot?.spot ?? null}
+          expiration={optionsSnapshot?.expiration ?? null}
+          callWalls={optionsSnapshot?.callWalls ?? []}
+          putWalls={optionsSnapshot?.putWalls ?? []}
+          maxPain={optionsSnapshot?.maxPain ?? null}
+        />
         <Card>
           <CardHeader>
             <CardTitle className="text-base font-semibold">
@@ -193,6 +216,8 @@ const StockDetailCard = async ({
             </div>
           </CardContent>
         </Card>
+
+        <StockShortInterestCard excd={excd} symb={pdno ?? meta.ticker} />
       </CardContent>
     </Card>
   );

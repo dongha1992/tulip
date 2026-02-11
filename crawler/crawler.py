@@ -1,4 +1,5 @@
 from playwright.async_api import async_playwright
+from playwright._impl._errors import TimeoutError as PlaywrightTimeoutError
 from typing import List, Dict
 import asyncio
 import os
@@ -115,16 +116,25 @@ async def get_borrow_fee_second_row_html(symbol: str) -> dict[str, str] | None:
         )
         try:
             page = await browser.new_page()
-            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            # JS 로딩이 필요한 경우를 대비해 networkidle까지 대기
+            await page.goto(url, wait_until="networkidle", timeout=45000)
 
-            # table 대기 (데이터 테이블)
-            await page.wait_for_selector("table", state="attached", timeout=15000)
+            try:
+                # 데이터 테이블이 렌더링될 시간을 넉넉히 준다
+                await page.wait_for_selector("table", state="attached", timeout=30000)
+            except PlaywrightTimeoutError:
+                # 테이블이 안 보이면 데이터 없는 것으로 처리
+                return None
 
             # 첫 번째 table만 사용
             table = await page.query_selector("table")
             if not table:
                 return None
-            trs = await table.query_selector_all("tr")
+
+            # tbody가 있으면 tbody tr, 없으면 전체 tr
+            trs = await table.query_selector_all("tbody tr")
+            if not trs:
+                trs = await table.query_selector_all("tr")
             if len(trs) < 2:
                 return None
 
@@ -149,6 +159,10 @@ async def get_borrow_fee_second_row_html(symbol: str) -> dict[str, str] | None:
                 "available": available,
                 "rebate3": rebate3,
             }
+        except Exception as e:
+            # 크롤링 실패 시 서버 에러 대신 None 반환 (클라이언트에서 n/a 처리)
+            print(f"[borrow-fee crawler] error for symbol={symbol}: {e}")
+            return None
         finally:
             await browser.close()
 

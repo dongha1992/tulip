@@ -27,8 +27,8 @@ export function PastPerformanceCard({
           </p>
         </div>
 
-        <Badge variant={r.score >= 3 ? 'default' : 'destructive'}>
-          {r.score}/5
+        <Badge variant={r.score >= 3 ? 'slightly-positive' : 'destructive'}>
+          {r.score} / 5
         </Badge>
       </CardHeader>
 
@@ -40,18 +40,23 @@ export function PastPerformanceCard({
           >
             <div className="min-w-0">
               <p className="text-sm font-medium">{it.label}</p>
-              {showDetail && it.detail && (
+              {showDetail && it && (
                 <p className="mt-1 break-words text-xs text-muted-foreground">
                   {it.detail}
                 </p>
               )}
             </div>
 
-            <Badge variant={it.pass ? 'default' : 'destructive'}>
+            <Badge variant={it.pass ? 'slightly-positive' : 'destructive'}>
               {it.pass ? <Check color="green" /> : <CircleX color="red" />}
             </Badge>
           </div>
         ))}
+        {r.summaryText && (
+          <p className="text-sm font-medium text-muted-foreground whitespace-pre-line">
+            {r.summaryText}
+          </p>
+        )}
       </CardContent>
     </Card>
   );

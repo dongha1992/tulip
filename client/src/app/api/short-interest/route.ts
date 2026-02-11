@@ -7,6 +7,21 @@ const CRAWLER_BASE =
   process.env.CRAWLER_URL?.replace(/\/$/, '') ??
   (isDev ? 'http://127.0.0.1:8080' : '');
 
+type CachedShortInterest = {
+  data: {
+    status: 'success';
+    symbol: string;
+    updated: string | null;
+    fee2: string | null;
+    available: string | null;
+    rebate3: string | null;
+  };
+  fetchedAt: number;
+};
+
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30분
+const shortInterestCache = new Map<string, CachedShortInterest>();
+
 export async function POST(req: Request) {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
@@ -26,9 +41,16 @@ export async function POST(req: Request) {
 
     if (!CRAWLER_BASE) {
       return NextResponse.json(
-        { error: 'CRAWLER_URL must be configured' },
+        { error: 'CRAWLER_URL가 설정되지 않았습니다.' },
         { status: 500 },
       );
+    }
+
+    // 30분 캐싱: 동일 symbol에 대해 30분 이내 요청이면 캐시 반환
+    const now = Date.now();
+    const cached = shortInterestCache.get(symbol);
+    if (cached && now - cached.fetchedAt < CACHE_TTL_MS) {
+      return NextResponse.json(cached.data);
     }
 
     const res = await fetch(`${CRAWLER_BASE}/crawl-short-interest`, {
@@ -44,15 +66,18 @@ export async function POST(req: Request) {
 
     const data = await res.json();
 
-    // crawler 응답: { status, symbol, row: { updated, fee2, available, rebate3 } }
-    return NextResponse.json({
+    const payload = {
       status: 'success',
       symbol: data.symbol,
       updated: data.row?.updated ?? null,
       fee2: data.row?.fee2 ?? null,
       available: data.row?.available ?? null,
       rebate3: data.row?.rebate3 ?? null,
-    });
+    } as const;
+
+    shortInterestCache.set(symbol, { data: payload, fetchedAt: now });
+
+    return NextResponse.json(payload);
   } catch (error) {
     console.error('short-interest API error:', error);
     return NextResponse.json(
@@ -61,4 +86,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

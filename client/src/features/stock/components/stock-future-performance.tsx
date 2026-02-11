@@ -41,11 +41,11 @@ export function FuturePerformanceCard({
         <Badge
           variant={
             r.score >= Math.ceil(r.items.length * 0.6)
-              ? 'default'
+              ? 'slightly-positive'
               : 'destructive'
           }
         >
-          {r.score}/{r.items.length}
+          {r.score} / {r.items.length}
         </Badge>
       </CardHeader>
 
@@ -64,7 +64,7 @@ export function FuturePerformanceCard({
               )}
             </div>
 
-            <Badge variant={it.pass ? 'default' : 'destructive'}>
+            <Badge variant={it.pass ? 'slightly-positive' : 'destructive'}>
               {it.pass ? <Check color="green" /> : <CircleX color="red" />}
             </Badge>
           </div>

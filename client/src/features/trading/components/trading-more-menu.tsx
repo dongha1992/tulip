@@ -67,6 +67,7 @@ function TradingMoreMenu({ trading, trigger }: TradingMoreMenuProps) {
   return (
     <>
       {deleteDialog}
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="right">

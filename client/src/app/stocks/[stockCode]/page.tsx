@@ -11,6 +11,7 @@ type StockDetailPageProps = {
   searchParams: Promise<{
     PRDT_TYPE_CD?: string;
     PDNO?: string;
+    EXCD?: string;
   }>;
 };
 
@@ -21,6 +22,7 @@ const StockDetailPage = async ({
   const { stockCode } = await params;
   const resolvedSearchParams = await searchParams;
   const productTypeCode = resolvedSearchParams.PRDT_TYPE_CD;
+  const excd = resolvedSearchParams.EXCD;
   const pdno = resolvedSearchParams.PDNO ?? stockCode;
 
   if (!productTypeCode) {
@@ -68,8 +70,9 @@ const StockDetailPage = async ({
           meta={meta}
           price={price}
           marketCap={marketCap}
-          basicInfo={basicInfo}
-          tickerSymbol={pdno}
+          tickerSymbol={meta.ticker}
+          pdno={pdno}
+          excd={excd ?? null}
         />
       </div>
     </div>

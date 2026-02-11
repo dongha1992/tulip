@@ -709,6 +709,8 @@ export type PastChecklistResult = {
   items: PastChecklistItem[];
   recentEnd?: string;
 
+  summaryText?: string;
+
   // optional debug numbers
   netMarginLatest?: number;
   netMarginPast?: number;
@@ -1107,6 +1109,47 @@ export function computePastChecklistSimplyStyle(
 
   const score = items.reduce((s, it) => s + (it.pass ? 1 : 0), 0);
 
+  const pct = (x?: number) =>
+    x == null || !Number.isFinite(x) ? 'n/a' : `${(x * 100).toFixed(1)}%`;
+
+  const summarizePast = () => {
+    const parts: string[] = [];
+
+    // 핵심 성장: NI 5Y CAGR이 있으면, 없으면 "흑자 전환" 같은 문구(이미 buildGrowthInfo가 있음)
+    if (netIncomeCagr5y != null) {
+      parts.push(`순이익 5Y CAGR ${pct(netIncomeCagr5y)}`);
+    } else if (earningsTrendPass && positiveCount3y >= 2) {
+      parts.push(`최근 3년 대체로 흑자`);
+    } else {
+      parts.push(`순이익 성장성 불확실`);
+    }
+
+    // 마진
+    if (netMarginLatest != null) {
+      parts.push(`순이익률 ${pct(netMarginLatest)}`);
+    }
+
+    // ROE
+    if (roe != null) {
+      parts.push(`ROE ${pct(roe)}`);
+    }
+
+    // 성장 가속화 힌트
+    if (revenueYoY != null && revenueCagr3y != null) {
+      parts.push(`매출 YoY ${pct(revenueYoY)} / 3Y CAGR ${pct(revenueCagr3y)}`);
+    } else if (revenueCagr3y != null) {
+      parts.push(`매출 3Y CAGR ${pct(revenueCagr3y)}`);
+    }
+
+    // 마지막에 PASS/FAIL 톤
+    const tone =
+      score >= 3 ? `전반적으로 양호` : score >= 2 ? `보통` : `주의 필요`;
+
+    return `- ${tone}\n\n- ${parts.filter(Boolean).join(' · ')}`;
+  };
+
+  const summaryText = summarizePast();
+
   return {
     score,
     items,
@@ -1118,5 +1161,6 @@ export function computePastChecklistSimplyStyle(
     netIncomeCagr5y,
     roe,
     quality: { ocfFY, niFY: latestNiFY?.val, fcfFY },
+    summaryText,
   };
 }

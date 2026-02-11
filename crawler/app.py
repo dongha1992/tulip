@@ -1,16 +1,30 @@
 from pathlib import Path
-
+import os
+from crawler import get_stock_feeds, get_borrow_fee_second_row_html, save_to_db 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
+from fastapi.middleware.cors import CORSMiddleware
+app = FastAPI()
 # 로컬: crawler/.env 또는 프로젝트 루트 .env 로드
 load_dotenv(Path(__file__).resolve().parent / ".env")
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-from crawler import get_stock_feeds, get_borrow_fee_second_row_html, save_to_db
+_cors_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://the-tulip.vercel.app",
+]
+if extra := os.getenv("CORS_ORIGINS", ""):
+    _cors_origins.extend(o.strip() for o in extra.split(",") if o.strip())
 
-app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class CrawlRequest(BaseModel):
