@@ -5,10 +5,13 @@ import type {
   StocksMetaInfoResponse,
 } from '@/features/stock/types';
 import Image from 'next/image';
+import type { QuoteSummaryResult } from 'yahoo-finance2/modules/quoteSummary';
 import { buildSimplySummaryDTO } from '../dto/stock-info';
 import { getCompanyFacts } from '../queries/get-company-facts';
 import { getSecCompanyTicker } from '../queries/get-sec-company-ticker';
+import { getYahooQuoteSummary } from '../queries/get-yahoo-stock-forecast';
 import type { CompanyFactsResponse, SecCompanyTickerMap } from '../types';
+import { FuturePerformanceCard } from './stock-future-performance';
 import { PastPerformanceCard } from './stock-past-performance';
 
 type StockDetailCardProps = {
@@ -31,6 +34,7 @@ const StockDetailCard = async ({
 }: StockDetailCardProps) => {
   let dto: ReturnType<typeof buildSimplySummaryDTO> = null;
   let companyFacts: CompanyFactsResponse | null = null;
+  let yahoo: QuoteSummaryResult | null = null;
 
   if (tickerSymbol) {
     const secTickers = (await getSecCompanyTicker()) as SecCompanyTickerMap;
@@ -42,31 +46,18 @@ const StockDetailCard = async ({
     const cik = match?.cik_str ?? '';
     if (cik) {
       companyFacts = await getCompanyFacts(cik);
-      console.log(companyFacts);
       if (!companyFacts) return null;
       dto = buildSimplySummaryDTO(companyFacts);
     }
-  }
 
-  function formatGrowth(x?: {
-    kind: 'cagr' | 'turnaround' | 'na';
-    value?: number;
-    label?: string;
-  }) {
-    if (!x || x.kind === 'na') return 'n/a';
-
-    if (x.kind === 'cagr' && typeof x.value === 'number') {
-      return `${(x.value * 100).toFixed(2)}%`;
-    }
-
-    if (x.kind === 'turnaround') {
-      return x.label ?? '흑자전환';
-    }
-
-    return 'n/a';
+    yahoo = await getYahooQuoteSummary(tickerSymbol ?? '');
   }
 
   if (!companyFacts) {
+    return null;
+  }
+
+  if (!yahoo) {
     return null;
   }
 
@@ -189,6 +180,7 @@ const StockDetailCard = async ({
           </CardContent>
         </Card>
         <PastPerformanceCard facts={companyFacts} showDetail={false} />
+        <FuturePerformanceCard facts={companyFacts} yahoo={yahoo} />
         <Card>
           <CardHeader>
             <CardTitle className="text-base font-semibold">

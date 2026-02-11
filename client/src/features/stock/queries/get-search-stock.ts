@@ -1,4 +1,4 @@
-import { getHantuAccessToken } from '@/features/stock/queries/get-hantu-access-token';
+import { withHantuToken } from '@/features/stock/queries/get-hantu-access-token';
 import { createFetcher } from '@/lib/fetcher';
 import { cache } from 'react';
 
@@ -111,14 +111,14 @@ export const getSearchStock = cache(
   async (
     options: GetSearchStockOptions,
   ): Promise<OverseasPriceDetailResponse> => {
-    const { access_token } = await getHantuAccessToken();
-
-    const data = await hantuFetcher.get<OverseasPriceDetailResponse>(
-      OVERSEAS_PRICE_DETAIL_PATH,
-      {
-        params: buildParams(options),
-        headers: { authorization: `Bearer ${access_token}` },
-      },
+    const data = await withHantuToken((access_token) =>
+      hantuFetcher.get<OverseasPriceDetailResponse>(
+        OVERSEAS_PRICE_DETAIL_PATH,
+        {
+          params: buildParams(options),
+          headers: { authorization: `Bearer ${access_token}` },
+        },
+      ),
     );
 
     if (data.rt_cd !== '0') {

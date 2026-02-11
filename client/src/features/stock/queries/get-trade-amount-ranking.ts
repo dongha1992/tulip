@@ -1,4 +1,4 @@
-import { getHantuAccessToken } from '@/features/stock/queries/get-hantu-access-token';
+import { withHantuToken } from '@/features/stock/queries/get-hantu-access-token';
 import type {
   TradeAmountRankingQuery,
   TradeAmountRankingResponse,
@@ -60,13 +60,11 @@ export const getTradeAmountRanking = cache(
   async (
     options: GetTradeAmountRankingOptions = {},
   ): Promise<TradeAmountRankingResponse> => {
-    const { access_token } = await getHantuAccessToken();
-    const data = await hantuFetcher.get<TradeAmountRankingResponse>(
-      TRADE_AMOUNT_RANKING_PATH,
-      {
+    const data = await withHantuToken((access_token) =>
+      hantuFetcher.get<TradeAmountRankingResponse>(TRADE_AMOUNT_RANKING_PATH, {
         params: buildParams(options),
         headers: { authorization: `Bearer ${access_token}` },
-      },
+      }),
     );
 
     if (data.rt_cd !== '0') {

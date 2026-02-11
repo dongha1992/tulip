@@ -29,6 +29,13 @@ export type SimplySummaryDTO = {
     value?: number;
     label?: string;
   };
+  futureScore?: string; // "2/4"
+  futureItems?: {
+    key: string;
+    label: string;
+    pass: boolean;
+    detail?: string;
+  }[];
 };
 
 type GrowthDisplay =

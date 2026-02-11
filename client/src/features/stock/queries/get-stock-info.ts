@@ -1,4 +1,4 @@
-import { getHantuAccessToken } from '@/features/stock/queries/get-hantu-access-token';
+import { withHantuToken } from '@/features/stock/queries/get-hantu-access-token';
 import type {
   OverseasStockBasicInfoQuery,
   OverseasStockBasicInfoResponse,
@@ -56,14 +56,14 @@ export const getStockInfo = cache(
   async (
     options: GetStockInfoOptions,
   ): Promise<OverseasStockBasicInfoResponse> => {
-    const { access_token } = await getHantuAccessToken();
-
-    const data = await hantuFetcher.get<OverseasStockBasicInfoResponse>(
-      OVERSEAS_STOCK_BASIC_INFO_PATH,
-      {
-        params: buildParams(options),
-        headers: { authorization: `Bearer ${access_token}` },
-      },
+    const data = await withHantuToken((access_token) =>
+      hantuFetcher.get<OverseasStockBasicInfoResponse>(
+        OVERSEAS_STOCK_BASIC_INFO_PATH,
+        {
+          params: buildParams(options),
+          headers: { authorization: `Bearer ${access_token}` },
+        },
+      ),
     );
 
     if (data.rt_cd !== '0') {

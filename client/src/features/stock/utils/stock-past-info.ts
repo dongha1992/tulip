@@ -53,7 +53,7 @@ function normalizeItems(items: SecFactItem[]): SecFactItem[] {
   );
 }
 
-function pickUnitSeries(
+export function pickUnitSeries(
   data: CompanyFactsResponse,
   taxonomy: string,
   concept: string,

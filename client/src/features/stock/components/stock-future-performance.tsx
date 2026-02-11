@@ -1,34 +1,51 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, CircleX } from 'lucide-react';
+import type { QuoteSummaryResult } from 'yahoo-finance2/modules/quoteSummary';
 import type { CompanyFactsResponse } from '../types';
-import { computePastChecklistSimplyStyle } from '../utils/stock-past-info';
+import { computeFutureChecklistSimplyStyle } from '../utils/stock-future-info';
 
-type PastPerformanceCardProps = {
+type FuturePerformanceCardProps = {
   facts: CompanyFactsResponse;
+  yahoo: QuoteSummaryResult;
   showDetail?: boolean;
+  savingsRate?: number; // ex) 0.03
+  highGrowthThreshold?: number; // ex) 0.2
+  roeThreshold?: number; // ex) 0.2
 };
 
-export function PastPerformanceCard({
+export function FuturePerformanceCard({
   facts,
-  showDetail = false,
-}: PastPerformanceCardProps) {
-  const r = computePastChecklistSimplyStyle(facts);
+  yahoo,
+  showDetail = true,
+  savingsRate = 0.03,
+  highGrowthThreshold = 0.2,
+  roeThreshold = 0.2,
+}: FuturePerformanceCardProps) {
+  const r = computeFutureChecklistSimplyStyle(facts, yahoo, {
+    savingsRate,
+    highGrowthThreshold,
+    roeThreshold,
+  });
 
   return (
     <Card className="mt-4">
       <CardHeader className="flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-base font-semibold">
-            과거 순이익 실적
-          </CardTitle>
+          <CardTitle className="text-base font-semibold">향후 성장</CardTitle>
           <p className="text-xs text-muted-foreground">
-            {r.recentEnd ? `기준일 ${r.recentEnd}` : ''}
+            {r.asOf ? `기준일 ${r.asOf}` : ''}
           </p>
         </div>
 
-        <Badge variant={r.score >= 3 ? 'default' : 'destructive'}>
-          {r.score}/5
+        <Badge
+          variant={
+            r.score >= Math.ceil(r.items.length * 0.6)
+              ? 'default'
+              : 'destructive'
+          }
+        >
+          {r.score}/{r.items.length}
         </Badge>
       </CardHeader>
 

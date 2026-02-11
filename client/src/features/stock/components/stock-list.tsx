@@ -51,6 +51,7 @@ const StockList = async ({ searchParams }: StockListProps) => {
       getStocksMetaInfo(searchParams),
       getTradeAmountRanking(),
     ]);
+
     const allMatches = matchRankingByName(
       tradeAmountRanking.output2,
       stocksMetaInfo,

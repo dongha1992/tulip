@@ -37,7 +37,7 @@ const StockDetailPage = async ({
 
   const meta = stocksMetaInfo.find((m) => m.stockCode === stockCode);
 
-  if (!meta) {
+  if (!meta || meta.ticker === '') {
     notFound();
   }
 

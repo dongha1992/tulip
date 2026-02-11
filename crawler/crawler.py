@@ -86,6 +86,73 @@ async def get_stock_feeds(stock_id: str, max_scrolls: int = 5) -> List[Dict]:
             await browser.close()
 
 
+async def get_borrow_fee_second_row_html(symbol: str) -> dict[str, str] | None:
+    """
+    ChartExchange borrow-fee 페이지에서 table의 두 번째 tr에서
+    의미 있는 값만 추출해서 반환.
+
+    - Updated: 첫 번째 td 텍스트
+    - Fee2: 두 번째 td 텍스트
+    - Available: 세 번째 td 텍스트
+    - Rebate3: 네 번째 td 텍스트
+
+    symbol 예: nyse-hims, nasdaq-aapl
+    """
+    url = f"https://chartexchange.com/symbol/{symbol}/borrow-fee/"
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-software-rasterizer",
+                "--disable-extensions",
+                "--no-first-run",
+            ],
+        )
+        try:
+            page = await browser.new_page()
+            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+
+            # table 대기 (데이터 테이블)
+            await page.wait_for_selector("table", state="attached", timeout=15000)
+
+            # 첫 번째 table만 사용
+            table = await page.query_selector("table")
+            if not table:
+                return None
+            trs = await table.query_selector_all("tr")
+            if len(trs) < 2:
+                return None
+
+            second_tr = trs[1]
+            tds = await second_tr.query_selector_all("td")
+            if len(tds) < 4:
+                return None
+
+            # 각 칸의 텍스트만 추출
+            texts: list[str] = []
+            for td in tds[:4]:
+                raw = await td.inner_text()
+                # 공백 정리
+                cleaned = " ".join(raw.split())
+                texts.append(cleaned)
+
+            updated, fee2, available, rebate3 = texts
+
+            return {
+                "updated": updated,
+                "fee2": fee2,
+                "available": available,
+                "rebate3": rebate3,
+            }
+        finally:
+            await browser.close()
+
+
 def save_to_db(stock_id: str, feeds: List[Dict]) -> None:
     if not DATABASE_URL:
         return

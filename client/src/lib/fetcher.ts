@@ -74,6 +74,7 @@ export function createFetcher(options: CreateFetcherOptions) {
       const init: FetcherRequestInit = {
         method: 'GET',
         headers: mergeHeaders(defaultHeaders, headers),
+        cache: 'no-store',
       };
       if (next) init.next = next;
 
@@ -95,6 +96,7 @@ export function createFetcher(options: CreateFetcherOptions) {
           ...headers,
         }),
         body: body !== undefined ? JSON.stringify(body) : undefined,
+        cache: 'no-store',
       };
       if (next) init.next = next;
 
