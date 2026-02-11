@@ -18,14 +18,13 @@ export function buildOwnershipBreakdownDTO(
   const insidersPct = normalizePctMaybe(safeNum(rawInsiders)); // 0~1
   const instPctRaw = normalizePctMaybe(safeNum(rawInst)); // 0~1
 
-  // ✅ Simply-like 보정: 기관/내부자 중복 제거
   // 기관(표시용) = 기관(원본) - 내부자 (내부자가 기관에 포함된 경우가 흔하므로)
   const instPct =
     instPctRaw != null && insidersPct != null
       ? clamp01(instPctRaw - insidersPct)
       : instPctRaw;
 
-  // ✅ 기타/일반(추정): Yahoo만으로 정부 분리는 불가 → "기관(원본)"의 나머지로 처리
+  // 기타/일반(추정): Yahoo만으로 정부 분리는 불가 → "기관(원본)"의 나머지로 처리
   // (이렇게 하면 insiders + inst(adjusted) + other = 100%가 항상 성립)
   const otherPct = instPctRaw != null ? clamp01(1 - instPctRaw) : undefined;
 

@@ -1,11 +1,11 @@
 import type { QuoteSummaryResult } from 'yahoo-finance2/modules/quoteSummary';
 import type { CompanyFactsResponse, SecFactItem } from '../types';
 import {
-    filterByForms,
-    filterByFp,
-    isAnnualLike,
-    parseDate,
-    pickUnitSeriesWithCurrencyFallback,
+  filterByForms,
+  filterByFp,
+  isAnnualLike,
+  parseDate,
+  pickUnitSeriesWithCurrencyFallback,
 } from './stock-past-info';
 
 // ---------- helpers ----------
@@ -15,7 +15,6 @@ function sortByEnd(items: SecFactItem[]) {
 
 /**
  * Balance sheet 계정은 "시점값"이라 FY/Q 구분이 엄격하지 않음.
- * Simply는 최신 10-Q(분기)까지 포함하므로 forms 우선순위로 최신 end를 잡는다.
  */
 const BALANCE_SHEET_FORMS = [
   '10-Q',
@@ -154,7 +153,6 @@ function pickCashPlusSTIAsOf(
   sec: CompanyFactsResponse,
   asOf: string,
 ): { value?: number; source?: string } {
-  // Simply가 가장 자주 쓰는 합산 태그
   const direct = pickSeriesBS(sec, [
     'CashCashEquivalentsAndShortTermInvestments',
   ]);
@@ -245,7 +243,7 @@ function pickTotalDebtAsOf(
     }
   }
 
-  // 3) ✅ 자동 탐색 (SEC facts에 실제 존재하는 debt 계정들 스캔)
+  // 3) 자동 탐색 (SEC facts에 실제 존재하는 debt 계정들 스캔)
   const debtNameRe =
     /(Debt|Borrow|Borrowings|NotesPayable|NotePayable|Convertible|Loan|CreditFacility|TermLoan|SeniorNotes|LeaseObligation|CapitalLease|FinanceLease)/i;
 
@@ -309,7 +307,7 @@ export type FinancialHealthResult = {
   items: FinancialHealthItem[];
   asOf?: string;
 
-  // ✅ 너가 원하는 3개 (Simply처럼)
+  // 너가 원하는 3개
   keyFacts: {
     debtToEquityPct?: number; // Debt / Equity (167.13%)
     debt?: number; // Debt (971.02m)
@@ -320,6 +318,8 @@ export type FinancialHealthResult = {
     totalLiabilities?: number; // total liabilities (1.65b)
     totalAssets?: number; // total assets (1.65b)
   };
+
+  summaryText?: string;
 
   // debug
   currentAssets?: number;
@@ -384,14 +384,14 @@ export function computeFinancialHealthChecklist(
   let debt = debtPack.debt;
 
   // ---- Interest coverage (TTM EBIT / TTM NetInterest 우선) ----
-  // Simply가 -7.4x 같은 음수 표기를 하는 경우가 있어서 "net interest"를 우선
+
   const ebitLikeSeries = pickSeriesIS(sec, [
     'EarningsBeforeInterestAndTaxes',
     'EBIT',
     'OperatingIncomeLoss',
   ]);
 
-  // ✅ Net interest 후보 더 확장 (Simply가 이 계열을 쓰는 경우 많음)
+  // Net interest 후보 더 확장
   const netInterestSeries = pickSeriesIS(sec, [
     'InterestIncomeExpenseNet',
     'InterestIncomeExpenseNonoperatingNet',
@@ -399,7 +399,7 @@ export function computeFinancialHealthChecklist(
     'InterestIncomeExpenseNetOfHedgingActivities',
   ]);
 
-  // ✅ expense 후보도 유지
+  // expense 후보도 유지
   const interestExpenseSeries = pickSeriesIS(sec, [
     'InterestExpense',
     'InterestExpenseNonoperating',
@@ -425,12 +425,12 @@ export function computeFinancialHealthChecklist(
           : undefined;
 
     if (ebitTTM?.val != null && denom != null) {
-      // ✅ abs 금지: Simply처럼 -7.4x 같은 부호를 살린다
+      // abs 금지
       interestCoverageX = ebitTTM.val / denom;
     }
   }
 
-  // ---- Yahoo Finance 보정 (가능하면 Simply 스타일에 더 가깝게) ----
+  // ---- Yahoo Finance 보정----
   const getNum = (v: unknown): number | undefined => {
     if (typeof v === 'number' && Number.isFinite(v)) return v;
     if (
@@ -524,11 +524,11 @@ export function computeFinancialHealthChecklist(
     }
   }
 
-  // ✅ Simply의 “부채/자본 비율” = Debt / Equity
+  // Debt / Equity
   const debtToEquityPct =
     equity != null && equity !== 0 && debt != null ? debt / equity : undefined;
 
-  // ✅ “부채 수준”은 netDebt/equity로 판단(체크리스트용)
+  // “부채 수준”은 netDebt/equity로 판단(체크리스트용)
   const netDebtToEquityPct =
     equity != null && equity !== 0 && debt != null && cash != null
       ? (debt - cash) / equity
@@ -684,6 +684,22 @@ export function computeFinancialHealthChecklist(
 
   const score = items.reduce((s, it) => s + (it.pass ? 1 : 0), 0);
 
+  // ---- summary text (코멘트) ----
+  let summaryText: string | undefined;
+  if (score >= Math.ceil(items.length * 0.8)) {
+    summaryText =
+      '현금 보유와 부채 수준을 고려했을 때 재무 건전성이 매우 양호한 편입니다.';
+  } else if (score >= Math.ceil(items.length * 0.6)) {
+    summaryText =
+      '대체로 무난한 재무 구조이며, 일부 항목만 추가 점검이 필요해 보입니다.';
+  } else if (score >= 2) {
+    summaryText =
+      '부채 구조나 이자 부담 측면에서 다소 아쉬운 부분이 있어 재무 리스크를 유의 깊게 볼 필요가 있습니다.';
+  } else {
+    summaryText =
+      '단기·장기 부채, 순부채/자본, 이자보상배율 등 여러 항목에서 취약한 신호가 보여 재무 건전성이 좋지 않은 편입니다.';
+  }
+
   return {
     score,
     items,
@@ -704,5 +720,6 @@ export function computeFinancialHealthChecklist(
     currentLiabilities: cl,
     nonCurrentAssets,
     nonCurrentLiabilities: ncl,
+    summaryText,
   };
 }

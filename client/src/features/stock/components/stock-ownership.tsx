@@ -25,10 +25,7 @@ export function OwnershipCard({ dto, showDetail = false }: OwnershipCardProps) {
     <Card className="mt-4">
       <CardHeader className="flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-base font-semibold">지분 구분</CardTitle>
-          <p className="text-xs text-muted-foreground">
-            {dto.asOf ? `기준일 ${dto.asOf}` : ''}
-          </p>
+          <CardTitle className="text-[20px] font-semibold">지분 구분</CardTitle>
         </div>
 
         <Badge variant={hasCore ? 'outline' : 'destructive'}>
@@ -37,19 +34,22 @@ export function OwnershipCard({ dto, showDetail = false }: OwnershipCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-2">
+        <p className="text-[13px] text-muted-foreground">
+          {dto.asOf ? `기준일 ${dto.asOf}` : ''}
+        </p>
         {sortedRows.map((r) => (
           <div
             key={r.key}
             className="flex items-start justify-between gap-3 rounded-md border p-3"
           >
             <div className="min-w-0">
-              <p className="text-sm font-medium">{r.label}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-[15px] font-medium">{r.label}</p>
+              <p className="mt-1 text-[13px] text-muted-foreground">
                 주식 수 {formatShares(r.shares)} · 지분율 {formatPct01(r.pct)}
               </p>
 
               {showDetail && r.key === 'other' && (
-                <p className="mt-1 break-words text-xs text-muted-foreground">
+                <p className="mt-1 break-words text-[12px] text-muted-foreground">
                   * Yahoo 데이터만으로 정부/공공기관을 별도 분리하기 어려워
                   나머지 지분을 “기타/일반(추정)”으로 표시합니다.
                 </p>
@@ -64,7 +64,9 @@ export function OwnershipCard({ dto, showDetail = false }: OwnershipCardProps) {
 
         {showDetail && (
           <div className="rounded-md bg-muted/40 p-2">
-            <p className="text-[11px] text-muted-foreground">총 발행주식수</p>
+            <p className="text-[12px] text-muted-foreground mb-1">
+              총 발행주식수
+            </p>
             <p className="font-semibold">
               {formatShares(dto.sharesOutstanding)}
             </p>

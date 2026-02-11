@@ -20,8 +20,8 @@ export type FutureChecklistResult = {
   asOf?: string;
 
   // debug / UI
-  earningsGrowth?: number; //  "이익 성장률" (Simply의 25.1%)
-  epsGrowth?: number; //  "EPS 성장률" (Simply의 22.68%)
+  earningsGrowth?: number; //  "이익 성장률"
+  epsGrowth?: number; //  "EPS 성장률"
   revenueGrowth?: number; //  매출 성장률
   forwardRoe?: number; //  미래 ROE 근사
 
@@ -46,7 +46,7 @@ function pickForwardEpsAvg(
   return typeof v === 'number' ? v : undefined;
 }
 
-/** ✅ "향후 3년이 전부 적자(EPS<=0)"면 Simply처럼 FAIL 근거 */
+/** "향후 3년이 전부 적자(EPS<=0)"*/
 function allEpsNonPositiveWithin3y(yahoo: QuoteSummaryResult): boolean {
   const eps1 = pickForwardEpsAvg(yahoo, '+1y');
   const eps2 = pickForwardEpsAvg(yahoo, '+2y');
@@ -138,7 +138,7 @@ function computeFutureRoeYahooStyle(
   return undefined;
 }
 
-export function computeFutureChecklistSimplyStyle(
+export function computeFutureChecklistStyle(
   sec: CompanyFactsResponse,
   yahoo: QuoteSummaryResult,
   opts?: {
@@ -189,7 +189,7 @@ export function computeFutureChecklistSimplyStyle(
   const eg = normGrowth(earningsGrowth);
   const epg = normGrowth(epsGrowth);
 
-  // ✅ PASS판단에 쓸 성장률: 둘 중 큰 값
+  //PASS판단에 쓸 성장률: 둘 중 큰 값
   const growthForPass =
     eg != null && epg != null ? Math.max(eg, epg) : (eg ?? epg);
 

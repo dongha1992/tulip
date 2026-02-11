@@ -2,11 +2,18 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getShortInterest } from '@/features/stock/queries/get-short-interest';
+import {
+  formatPct01,
+  formatShares,
+} from '@/features/stock/utils/stock-ownership';
 import { useState } from 'react';
 
 type Props = {
   excd: string | null;
   symb: string | null;
+  shortPercentOfFloat?: number | null;
+  sharesShort?: number | null;
+  sharesOutstanding?: number | null;
 };
 
 type ShortInterestData = {
@@ -16,7 +23,13 @@ type ShortInterestData = {
   rebate3: string | null;
 };
 
-export function StockShortInterestCard({ excd, symb }: Props) {
+export function StockShortInterestCard({
+  excd,
+  symb,
+  shortPercentOfFloat,
+  sharesShort,
+  sharesOutstanding,
+}: Props) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<ShortInterestData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,22 +64,53 @@ export function StockShortInterestCard({ excd, symb }: Props) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-base font-semibold">공매도</CardTitle>
+        <CardTitle className="text-[20px] font-semibold">공매도</CardTitle>
         <button
           type="button"
           onClick={handleLoad}
           disabled={loading}
           className="text-sm text-green underline disabled:opacity-50 cursor-pointer"
         >
-          {loading ? '불러오는 중...' : '최신 데이터 불러오기'}
+          {loading ? '불러오는 중...' : '상세 데이터 불러오기'}
         </button>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
         {error && <p className="text-xs text-destructive">{error}</p>}
 
+        {/* Yahoo 기반: 전체 유통주식 대비 공매도 비율  */}
+        {(shortPercentOfFloat != null ||
+          sharesShort != null ||
+          sharesOutstanding != null) && (
+          <div className="space-y-1 rounded-md bg-muted/40 p-2 text-[12px]">
+            <div className="flex justify-between">
+              <span className="text-[15px] font-medium mb-1">
+                전체 유통주식 대비 공매도 비율
+              </span>
+              <span className="text-sm font-medium font-semibold">
+                {shortPercentOfFloat != null
+                  ? formatPct01(shortPercentOfFloat)
+                  : 'n/a'}
+              </span>
+            </div>
+            <div className="flex justify-between text-[12px] text-muted-foreground mb-1">
+              <span>공매도 주식 수 (추정)</span>
+              <span>
+                {sharesShort != null ? formatShares(sharesShort) : 'n/a'}
+              </span>
+            </div>
+            {sharesOutstanding != null && (
+              <div className="flex justify-between text-[12px] text-muted-foreground">
+                <span>발행주식수(또는 유통주식수)</span>
+                <span>{formatShares(sharesOutstanding)}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ChartExchange/IB 기반 Borrow Fee 섹션 (버튼 클릭 시 로딩) */}
         {data ? (
           <>
-            <p className="text-[12px] text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground pt-6">
               {data.updated
                 ? `기준일 ${data.updated}`
                 : 'Borrow fee 데이터가 없습니다.'}
@@ -88,7 +132,7 @@ export function StockShortInterestCard({ excd, symb }: Props) {
               <span className="font-semibold">{data.rebate3 ?? 'n/a'}%</span>
             </div>
 
-            <div className="mt-6 space-y-3 text-[10px] text-muted-foreground">
+            <div className="mt-6 space-y-3 text-[12px] text-muted-foreground">
               <p>
                 1) Interactive Brokers에서 제공하는 데이터로, 약 15분마다
                 갱신됩니다. 업데이트가 없다면 현재는 대여 가능한 주식이 없는
@@ -107,10 +151,6 @@ export function StockShortInterestCard({ excd, symb }: Props) {
               </p>
             </div>
           </>
-        ) : !loading && !error ? (
-          <p className="text-sm font-medium text-muted-foreground">
-            버튼을 눌러 공매도 관련 지표를 불러오세요.
-          </p>
         ) : null}
       </CardContent>
     </Card>

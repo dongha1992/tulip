@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, CircleX } from 'lucide-react';
 import type { QuoteSummaryResult } from 'yahoo-finance2/modules/quoteSummary';
 import type { CompanyFactsResponse } from '../types';
-import { computeFutureChecklistSimplyStyle } from '../utils/stock-future-info';
+import { computeFutureChecklistStyle } from '../utils/stock-future-info';
 
 type FuturePerformanceCardProps = {
   facts: CompanyFactsResponse;
@@ -22,7 +22,7 @@ export function FuturePerformanceCard({
   highGrowthThreshold = 0.2,
   roeThreshold = 0.2,
 }: FuturePerformanceCardProps) {
-  const r = computeFutureChecklistSimplyStyle(facts, yahoo, {
+  const r = computeFutureChecklistStyle(facts, yahoo, {
     savingsRate,
     highGrowthThreshold,
     roeThreshold,
@@ -32,10 +32,7 @@ export function FuturePerformanceCard({
     <Card className="mt-4">
       <CardHeader className="flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-base font-semibold">향후 성장</CardTitle>
-          <p className="text-xs text-muted-foreground">
-            {r.asOf ? `기준일 ${r.asOf}` : ''}
-          </p>
+          <CardTitle className="text-[20px] font-semibold">향후 성장</CardTitle>
         </div>
 
         <Badge
@@ -50,15 +47,18 @@ export function FuturePerformanceCard({
       </CardHeader>
 
       <CardContent className="space-y-2">
+        <p className="text-[13px] text-muted-foreground">
+          {r.asOf ? `기준일 ${r.asOf}` : ''}
+        </p>
         {r.items.map((it) => (
           <div
             key={it.key}
             className="flex items-start justify-between gap-3 rounded-md border p-3"
           >
             <div className="min-w-0">
-              <p className="text-sm font-medium">{it.label}</p>
+              <p className="text-[15px] font-medium">{it.label}</p>
               {showDetail && it.detail && (
-                <p className="mt-1 break-words text-xs text-muted-foreground">
+                <p className="mt-1 break-words text-[13px] text-muted-foreground">
                   {it.detail}
                 </p>
               )}

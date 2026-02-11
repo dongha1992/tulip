@@ -1,6 +1,6 @@
 import type { CompanyFactsResponse, SecFactItem } from '../types';
 import {
-  computeSimplyStyleMetrics,
+  computeStyleMetrics,
   filterByForms,
   filterByFp,
   formatPct,
@@ -9,7 +9,7 @@ import {
   pickUnitSeriesWithCurrencyFallback,
 } from '../utils/stock-past-info';
 
-export type SimplySummaryDTO = {
+export type SummaryDTO = {
   recentUpdateEnd: string; // "2025-09-30"
   revenueTtm?: number; // raw number
   netIncomeTtm?: number;
@@ -79,10 +79,10 @@ function toFYSeriesFallbackAnnualLike(items: SecFactItem[]): SecFactItem[] {
   return annualLike;
 }
 
-export function buildSimplySummaryDTO(
+export function buildSummaryDTO(
   data: CompanyFactsResponse,
-): SimplySummaryDTO | null {
-  const m = computeSimplyStyleMetrics(data);
+): SummaryDTO | null {
+  const m = computeStyleMetrics(data);
   if (!m) return null;
 
   // --- (A) NetIncome FY series (turnaround용) ---

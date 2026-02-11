@@ -148,7 +148,7 @@ function computeTTM(items: SecFactItem[]): {
 } | null {
   const sorted = [...items].sort((a, b) => parseDate(a.end) - parseDate(b.end));
 
-  // 1️⃣ fp 기준 분기 4개(10-Q) 우선 (기존)
+  // fp 기준 분기 4개(10-Q) 우선 (기존)
   const qByFp = sorted.filter(
     (x) =>
       ['Q1', 'Q2', 'Q3', 'Q4'].includes(String(x.fp)) &&
@@ -164,7 +164,7 @@ function computeTTM(items: SecFactItem[]): {
     };
   }
 
-  // 2️⃣ duration 기반 분기 4개 fallback (기존)
+  // duration 기반 분기 4개 fallback (기존)
   const qByDuration = sorted.filter(
     (x) => x.start && ['10-Q', '10-Q/A'].includes(String(x.form)),
   );
@@ -178,7 +178,7 @@ function computeTTM(items: SecFactItem[]): {
     };
   }
 
-  // 3️⃣ FY / 10-K 마지막 fallback (기존)
+  // FY / 10-K 마지막 fallback (기존)
   const fy = sorted.filter(
     (x) => x.fp === 'FY' && ['10-K', '10-K/A'].includes(String(x.form)),
   );
@@ -188,14 +188,14 @@ function computeTTM(items: SecFactItem[]): {
     return { end: last.end, val: last.val, source: 'FY' };
   }
 
-  // ✅ 4️⃣ (ADR/IFRS) 연간처럼 보이는 duration 마지막 값
+  // (ADR/IFRS) 연간처럼 보이는 duration 마지막 값
   const annualLike = sorted.filter(isAnnualLike);
   if (annualLike.length) {
     const last = annualLike[annualLike.length - 1];
     return { end: last.end, val: last.val, source: 'ANNUAL_LIKE' };
   }
 
-  // ✅ 5️⃣ (ADR/IFRS) 분기처럼 보이는 duration 4개 합산
+  // (ADR/IFRS) 분기처럼 보이는 duration 4개 합산
   const quarterLike = sorted.filter(isQuarterLike);
   if (quarterLike.length >= 4) {
     const last4 = quarterLike.slice(-4);
@@ -219,7 +219,7 @@ function pickLatestAnnual(
     return { end: last.end, val: last.val };
   }
 
-  // ✅ 추가: annual-like duration
+  //  추가: annual-like duration
   const annualLike = [...items]
     .filter(isAnnualLike)
     .sort((a, b) => parseDate(a.end) - parseDate(b.end));
@@ -357,7 +357,7 @@ function buildGrowthInfo(
   };
 }
 
-export function computeSimplyStyleMetrics(
+export function computeStyleMetrics(
   data: CompanyFactsResponse,
 ): Metrics | null {
   // ---- concept 후보들 ----
@@ -687,7 +687,7 @@ function pickBestSeriesByTTMSupport(
 // ==============================
 // Past checklist (5 items)
 // - 산업 비교(outperformIndustry) 제거
-// - Simply 느낌: 보수적으로 PASS 조건 설정
+// -  느낌: 보수적으로 PASS 조건 설정
 // ==============================
 
 export type PastChecklistKey =
@@ -735,14 +735,14 @@ function pickLatestAsOf(
 }
 
 /**
- * SimplyWallSt 스타일 "과거 기준 점검" (산업 비교 제외)
+ * WallSt 스타일 "과거 기준 점검" (산업 비교 제외)
  * - 1) 양질의 수익 (OCF > NI 또는 FCF > 0)
  * - 2) 이익 마진 증가 (5y 전 대비 최근 마진 증가)
  * - 3) 수익추이 (최근 FY 순이익 > 0 AND NI 5y CAGR > 0)
  * - 4) 성장 가속화 (Rev 3y CAGR > Rev 5y CAGR)
  * - 5) 높은 ROE (ROE > 15% 기본)
  */
-// ✅ 추가 헬퍼: 특정 FY end에 맞는 값을 우선 뽑고, 없으면 최신 FY
+//  추가 헬퍼: 특정 FY end에 맞는 값을 우선 뽑고, 없으면 최신 FY
 function pickFYAsOf(items: SecFactItem[], end: string): SecFactItem | null {
   const fy = items.filter(
     (x) =>
@@ -759,7 +759,7 @@ function pickFYAsOf(items: SecFactItem[], end: string): SecFactItem | null {
   return (asOf.length ? asOf[asOf.length - 1] : fy[fy.length - 1]) ?? null;
 }
 
-export function computePastChecklistSimplyStyle(
+export function computePastChecklistStyle(
   data: CompanyFactsResponse,
   opts?: { roeThreshold?: number }, // default 0.15
 ): PastChecklistResult {
@@ -866,8 +866,8 @@ export function computePastChecklistSimplyStyle(
   const recentEnd = latestNiFY?.end ?? latestRevFY?.end;
 
   // =========================
-  // 1) Quality of Earnings (Simply-like)
-  // ✅ rule: NI(FY) > 0 AND FCF(FY) > NI(FY)
+  // 1) Quality of Earnings
+  //  rule: NI(FY) > 0 AND FCF(FY) > NI(FY)
   // =========================
   const ocf = ((): SecFactItem[] => {
     for (const c of ocfConcepts) {
@@ -927,8 +927,8 @@ export function computePastChecklistSimplyStyle(
     fcfFY > latestNiFY.val;
 
   // =========================
-  // 2) Improving margins (Simply-like)
-  // ✅ rule: (latest margin > 0) AND (YoY margin improved)
+  // 2) Improving margins
+  //  rule: (latest margin > 0) AND (YoY margin improved)
   // =========================
   let netMarginLatest: number | undefined;
   let netMarginPast: number | undefined; // 여기서는 "YoY" 의미로 바로 전 FY 마진
@@ -977,18 +977,17 @@ export function computePastChecklistSimplyStyle(
     }
   }
 
-  // ✅ helper: 연간(FY 또는 annual-like)만 추려서 end 기준 정렬
+  //  helper: 연간(FY 또는 annual-like)만 추려서 end 기준 정렬
   const annualNi = [...netIncomeFYSeries]
     .filter((x) => x.fp === 'FY' || isAnnualLike(x))
     .sort((a, b) => parseDate(a.end) - parseDate(b.end));
 
-  // ✅ 최근 3개 "연간" 기준 흑자 카운트
+  //  최근 3개 "연간" 기준 흑자 카운트
   const last3Ni = annualNi.slice(-3);
   const positiveCount3y = last3Ni.filter((x) => x.val > 0).length;
 
   const niLatest = latestNiFY?.val;
 
-  // ✅ Simply에 더 가까운 해석:
   // - CAGR이 계산 가능하면 CAGR>0
   // - CAGR이 n/a면 "최근 3년 중 대부분(>=2) 흑자"면 PASS
   const earningsTrendPass =
@@ -998,8 +997,8 @@ export function computePastChecklistSimplyStyle(
       (netIncomeCagr5y == null && positiveCount3y >= 2));
 
   // =========================
-  // 4) Accelerating growth (Simply-like)
-  // ✅ rule: Rev YoY growth > Rev 3Y CAGR
+  // 4) Accelerating growth
+  //  rule: Rev YoY growth > Rev 3Y CAGR
   // =========================
   let revenueCagr3y: number | undefined;
   let revenueYoY: number | undefined;
@@ -1066,7 +1065,7 @@ export function computePastChecklistSimplyStyle(
         latestNiFY?.val != null && latestNiFY.val <= 0
           ? `NI(FY) ${latestNiFY.val.toLocaleString()} (적자 → FAIL)`
           : fcfFY != null && latestNiFY?.val != null
-            ? `FCF(FY) ${fcfFY.toLocaleString()} vs NI(FY) ${latestNiFY.val.toLocaleString()} (Simply: FCF>NI)`
+            ? `FCF(FY) ${fcfFY.toLocaleString()} vs NI(FY) ${latestNiFY.val.toLocaleString()} (FCF>NI)`
             : 'FCF/NI 데이터 부족',
     },
     {
