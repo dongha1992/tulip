@@ -30,6 +30,17 @@ body {
   --color-chart-3: hsl(197 37% 24%);
   --color-chart-4: hsl(43 74% 66%);
   --color-chart-5: hsl(27 87% 67%);
+  /* Figma Badge colors */
+  --color-badge-red: #E73445;
+  --color-badge-red-bg: #FFEDEC;
+  --color-badge-blue: #3182F6;
+  --color-badge-blue-bg: #E6F0FF;
+  --color-badge-orange: #F2792C;
+  --color-badge-orange-bg: #FFF5E6;
+  --color-badge-green: #029359;
+  --color-badge-green-bg: #E6FFEC;
+  --color-badge-gray: #808080;
+  --color-badge-gray-bg: #F0F0F0;
 }
 
 .dark {
@@ -57,6 +68,17 @@ body {
   --color-chart-3: hsl(30 80% 55%);
   --color-chart-4: hsl(280 65% 60%);
   --color-chart-5: hsl(340 75% 55%);
+  /* Figma Badge colors */
+  --color-badge-red: #E73445;
+  --color-badge-red-bg: #FFEDEC;
+  --color-badge-blue: #3182F6;
+  --color-badge-blue-bg: #E6F0FF;
+  --color-badge-orange: #F2792C;
+  --color-badge-orange-bg: #FFF5E6;
+  --color-badge-green: #029359;
+  --color-badge-green-bg: #E6FFEC;
+  --color-badge-gray: #808080;
+  --color-badge-gray-bg: #F0F0F0;
 }
 
 * {

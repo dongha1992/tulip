@@ -9,7 +9,11 @@ type SearchInputProps = {
   placeholder: string;
 };
 
-const SearchInput = ({ value, onChange, placeholder }: SearchInputProps) => {
+const SearchInput = ({
+  value,
+  onChange,
+  placeholder = '',
+}: SearchInputProps) => {
   const handleSearch = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange(event.target.value);

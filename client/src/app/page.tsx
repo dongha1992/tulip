@@ -1,71 +1,40 @@
-'use client';
+import { Heading } from '@/components/heading';
+import { Spinner } from '@/components/spinner';
+import { StockList } from '@/features/stock/components/stock-list';
+import { getYahooQuoteSummary } from '@/features/stock/queries/get-yahoo-stock-forecast';
+import { stockSearchParamsCache } from '@/features/stock/search-params';
+import { SearchParams } from 'nuqs/server';
+import { Suspense } from 'react';
 
-import { useAuth } from '@/features/auth/hooks/use-auth';
-import { useState } from 'react';
+type HomePageProps = {
+  searchParams: Promise<SearchParams>;
+};
 
-export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const { user } = useAuth();
+const HomePage = async ({ searchParams }: HomePageProps) => {
+  // 기본 모듈 (financialData, earningsTrend)
+  const summary = await getYahooQuoteSummary('AAPL');
 
-  const handleAnalyze = async (stockId: string) => {
-    // 로그인 여부 체크
-    if (!user) {
-      return;
-    }
+  // 특정 모듈만 요청
 
-    // // 클라이언트 기준: 회원당 하루 한 번만 실행 (user.id 기준으로 기록)
-    // if (typeof window !== 'undefined') {
-    //   const key = `lastAnalyzeAt:${user.id}`;
-    //   const last = window.localStorage.getItem(key);
-    //   if (last) {
-    //     const lastDate = new Date(last);
-    //     const now = new Date();
-    //     const diffMs = now.getTime() - lastDate.getTime();
-    //     const oneDayMs = 24 * 60 * 60 * 1000;
+  // 사용 예
+  const price = summary.price?.regularMarketPrice;
+  const currency = summary.price?.currency;
+  const financialData = summary.financialData; // targetMeanPrice, recommendationKey 등
+  const earningsTrend = summary.earningsTrend; //
+  const insights = summary.insights;
 
-    //     if (diffMs < oneDayMs) {
-    //       alert('감정 분석은 회원당 하루에 한 번만 이용할 수 있습니다.');
-    //       return;
-    //     }
-    //   }
-    // }
-
-    setLoading(true);
-    try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stock_id: stockId }),
-      });
-      const data = await res.json();
-      setResult(data);
-
-      // if (typeof window !== 'undefined') {
-      //   const key = `lastAnalyzeAt:${user.id}`;
-      //   window.localStorage.setItem(key, new Date().toISOString());
-      // }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  console.log(result);
-
+  // console.log(price, currency, financialData, earningsTrend, insights);
   return (
-    <div className="">
-      <span>홈</span>
-      <div className="flex justify-center items-center">
-        <button
-          onClick={() => handleAnalyze('AMX0240604001')}
-          disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-blue-600 disabled:opacity-60"
-        >
-          {loading ? '분석 중...' : '감정 분석'}
-        </button>
-      </div>
+    <div className="flex-1 flex flex-col gap-y-8">
+      <Heading title="주식들" description="" />
+
+      <Suspense fallback={<Spinner />}>
+        <StockList
+          searchParams={stockSearchParamsCache.parse(await searchParams)}
+        />
+      </Suspense>
     </div>
   );
-}
+};
+
+export default HomePage;
