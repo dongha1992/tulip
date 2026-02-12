@@ -1,7 +1,19 @@
+import re
+from collections import Counter
+
 import torch
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import re
+
+
+# 키워드 추출 시 제외할 조사·흔한 단어 (의미 있는 키워드만 남기기 위함)
+STOPWORDS = {
+    "은", "는", "이", "가", "을", "를", "의", "에", "와", "과", "도", "만", "에서",
+    "으로", "로", "한", "하다", "있다", "되다", "그", "이", "저", "그것", "이것",
+    "저것", "무엇", "어떤", "어디", "언제", "왜", "how", "the", "a", "an", "is",
+    "are", "was", "were", "to", "of", "in", "on", "for", "and", "or", "but",
+}
+
 
 class SentimentAnalyzer:
     def __init__(self):
@@ -23,7 +35,7 @@ class SentimentAnalyzer:
             ],
             'very_negative': [
                 '으아', '살려', '하..', '하...', '흑..', '헐..', '에휴','한강가자',
-                '한강물', '어휴', '상폐', '삭제','ㅡㅡ'
+                '한강물', '어휴', '상폐', '삭제','ㅡㅡ','숨김','안돼','안돼요','안돼',
             ],
             'swear_words': [
                 'ㅅㅂ', 'ㅂㅅ', 'ㅈㄹ', 'ㅁㅊ', 'ㅅㄲ','ㅈㄴ', 'ㅗㅗ',
@@ -126,3 +138,38 @@ class SentimentAnalyzer:
                 'label': "중립",
                 'confidence': "낮음"
             }
+
+    def extract_top_keywords(self, texts: list[str], top_n: int = 3) -> list[str]:
+        """
+        피드 텍스트 전체에서 많이 등장한, 의미 있는 키워드 상위 top_n개 반환.
+        조사·감정사전·stopword 제외 후 빈도 기준.
+        """
+        if not texts:
+            return []
+
+        # 감정 사전에 있는 단어는 키워드 후보에서 제외 (의미 있는 주제어 위주)
+        exclude = set(STOPWORDS)
+        for key in ("positive", "negative", "very_negative", "swear_words"):
+            exclude.update(self.EMOTION_DICT[key])
+
+        # 한글·영문·숫자 연속만 토큰으로 (2자 이상)
+        token_re = re.compile(r"[가-힣a-zA-Z0-9]{2,}")
+        counter: Counter[str] = Counter()
+
+        for text in texts:
+            if not text or not isinstance(text, str):
+                continue
+            normalized = self.preprocess_text(text)
+            tokens = token_re.findall(normalized)
+            for t in tokens:
+                t_lower = t.lower()
+                if t_lower in exclude or t in exclude:
+                    continue
+                # 숫자만 있는 토큰 제외
+                if t.isdigit():
+                    continue
+                counter[t_lower] += 1
+
+        # 빈도 내림차순, 동점이면 원문 등장 순서 유지하고 싶으면 그대로 두고 상위 n개
+        top = counter.most_common(top_n)
+        return [word for word, _ in top]

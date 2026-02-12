@@ -14,7 +14,10 @@ class SentimentRequest(BaseModel):
 
 @app.post("/analysis")
 def analyze(request: SentimentRequest):
-    return [analyzer.analyze_text(text) for text in request.texts]
+    texts = request.texts or []
+    results = [analyzer.analyze_text(text) for text in texts]
+    top_keywords = analyzer.extract_top_keywords(texts, top_n=3)
+    return {"results": results, "top_keywords": top_keywords}
 
 
 @app.get("/health")
