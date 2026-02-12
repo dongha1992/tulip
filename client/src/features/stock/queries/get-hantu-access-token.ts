@@ -16,6 +16,14 @@ export type HantuTokenResponse = {
 
 const TOKEN_PATH = '/oauth2/tokenP';
 
+/** 한투 API 키가 설정돼 있는지  */
+export function hasHantuConfig(): boolean {
+  const appkey = process.env.HANTU_APP_KEY ?? process.env.HANTU_API_KEY;
+  const appsecret =
+    process.env.HANTU_APP_SECRET ?? process.env.HANTU_SECRET_KEY;
+  return Boolean(appkey && appsecret);
+}
+
 function getHantuBaseUrl(): string {
   const url =
     process.env.HANTU_BASE_URL ?? 'https://openapi.koreainvestment.com:9443';
