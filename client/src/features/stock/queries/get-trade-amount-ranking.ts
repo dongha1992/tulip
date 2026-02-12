@@ -65,10 +65,6 @@ export const getTradeAmountRanking = cache(
   async (
     options: GetTradeAmountRankingOptions = {},
   ): Promise<TradeAmountRankingResponse> => {
-    // if (!hasHantuConfig()) {
-    //   return EMPTY_RANKING;
-    // }
-
     const data = await withHantuToken((access_token) =>
       hantuFetcher.get<TradeAmountRankingResponse>(TRADE_AMOUNT_RANKING_PATH, {
         params: buildParams(options),

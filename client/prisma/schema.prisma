@@ -96,3 +96,11 @@ enum TradingStatus {
   IN_PROGRESS
   DONE
 }
+
+model HantuToken {
+  id          String   @id @default("hantu")
+  accessToken String
+  expiresAt   DateTime
+
+  @@map("hantu_token")
+}

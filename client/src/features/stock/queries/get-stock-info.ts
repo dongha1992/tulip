@@ -53,10 +53,6 @@ export const getStockInfo = cache(
   async (
     options: GetStockInfoOptions,
   ): Promise<OverseasStockBasicInfoResponse | null> => {
-    // if (!hasHantuConfig()) {
-    //   return null;
-    // }
-
     const data = await withHantuToken((access_token) =>
       hantuFetcher.get<OverseasStockBasicInfoResponse>(
         OVERSEAS_STOCK_BASIC_INFO_PATH,

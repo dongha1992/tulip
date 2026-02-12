@@ -1,5 +1,16 @@
 import { createFetcher } from '@/lib/fetcher';
+import { prisma } from '@/lib/prisma';
 import { cache } from 'react';
+
+const HANTU_TOKEN_ID = 'hantu';
+
+const REFRESH_BUFFER_MS = 5 * 60 * 1000;
+
+/** API가 토큰 만료로 거부할 때 내려주는 코드 */
+export const HANTU_TOKEN_EXPIRED_CODE = 'EGW00123';
+
+/** 토큰 발급 1분당 1회 제한 */
+export const HANTU_TOKEN_RATE_LIMIT_CODE = 'EGW00133';
 
 export type HantuTokenRequest = {
   grant_type: 'client_credentials';
@@ -15,13 +26,6 @@ export type HantuTokenResponse = {
 };
 
 const TOKEN_PATH = '/oauth2/tokenP';
-
-/** 한투 API 키가 설정돼 있는지  */
-export function hasHantuConfig(): boolean {
-  const appkey = process.env.HANTU_APP_KEY;
-  const appsecret = process.env.HANTU_SECRET_KEY;
-  return Boolean(appkey && appsecret);
-}
 
 function getHantuBaseUrl(): string {
   const url =
@@ -51,20 +55,16 @@ const hantuTokenFetcher = createFetcher({
   },
 });
 
-/** 만료 5분 전이면 재발급 (서버가 조기 만료할 수 있어 여유 둠) */
-const REFRESH_BUFFER_MS = 5 * 60 * 1000;
+let memoryCache: { token: HantuTokenResponse; expiresAt: number } | null = null;
 
-/** API가 토큰 만료로 거부할 때 내려주는 코드 */
-export const HANTU_TOKEN_EXPIRED_CODE = 'EGW00123';
-
-/** 토큰 발급 1분당 1회 제한 */
-export const HANTU_TOKEN_RATE_LIMIT_CODE = 'EGW00133';
-
-let cached: { token: HantuTokenResponse; expiresAt: number } | null = null;
-
-/** 토큰 캐시 비우기 (만료 오류 시 재발급 유도용) */
-export function clearHantuTokenCache(): void {
-  cached = null;
+/** 토큰 캐시 비우기  */
+export async function clearHantuTokenCache(): Promise<void> {
+  memoryCache = null;
+  try {
+    await prisma.hantuToken.delete({ where: { id: HANTU_TOKEN_ID } });
+  } catch {
+    console.error('토큰 캐시 비우기 실패');
+  }
 }
 
 function wrapTokenFetchError(err: unknown): never {
@@ -75,52 +75,101 @@ function wrapTokenFetchError(err: unknown): never {
   throw err;
 }
 
-async function fetchHantuToken(): Promise<HantuTokenResponse> {
+/** DB에 유효한 토큰이 있으면 반환 */
+async function getTokenFromDb(now: number): Promise<HantuTokenResponse | null> {
+  try {
+    const dbToken = await prisma.hantuToken.findUnique({
+      where: { id: HANTU_TOKEN_ID },
+    });
+    if (!dbToken || dbToken.expiresAt.getTime() <= now + REFRESH_BUFFER_MS) {
+      return null;
+    }
+    return {
+      access_token: dbToken.accessToken,
+      token_type: 'Bearer',
+      expires_in: Math.round((dbToken.expiresAt.getTime() - now) / 1000),
+      access_token_token_expired: dbToken.expiresAt.toISOString(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchAndSaveToken(): Promise<HantuTokenResponse> {
   const now = Date.now();
   const body = getTokenBody();
-  try {
-    const data = await hantuTokenFetcher.post<HantuTokenResponse>(
-      TOKEN_PATH,
-      body,
-      { next: { revalidate: false } },
-    );
-    if (!data.access_token) {
-      throw new Error('접근토큰 발급 실패: access_token 없음');
-    }
-    cached = {
-      token: data,
-      expiresAt: now + data.expires_in * 1000,
-    };
-    return data;
-  } catch (e) {
-    wrapTokenFetchError(e);
+  const data = await hantuTokenFetcher.post<HantuTokenResponse>(
+    TOKEN_PATH,
+    body,
+    { next: { revalidate: false } },
+  );
+
+  if (!data.access_token) {
+    throw new Error('접근토큰 발급 실패: access_token 없음');
   }
+
+  const expiresAt = new Date(now + data.expires_in * 1000);
+  memoryCache = { token: data, expiresAt: expiresAt.getTime() };
+  try {
+    await prisma.hantuToken.upsert({
+      where: { id: HANTU_TOKEN_ID },
+      create: {
+        id: HANTU_TOKEN_ID,
+        accessToken: data.access_token,
+        expiresAt,
+      },
+      update: {
+        accessToken: data.access_token,
+        expiresAt,
+      },
+    });
+  } catch {
+    console.error('토큰 저장 실패');
+  }
+  return data;
 }
 
 export const getHantuAccessToken = cache(
   async (forceNew = false): Promise<HantuTokenResponse> => {
-    if (forceNew) {
-      cached = null;
-    }
-
     const now = Date.now();
 
-    if (cached && now < cached.expiresAt - REFRESH_BUFFER_MS) {
-      return cached.token;
+    if (forceNew) {
+      memoryCache = null;
+      try {
+        await prisma.hantuToken.delete({ where: { id: HANTU_TOKEN_ID } });
+      } catch {}
     }
 
-    if (cached && now >= cached.expiresAt) {
-      cached = null;
+    // 1) 메모리 캐시
+    if (memoryCache && now < memoryCache.expiresAt - REFRESH_BUFFER_MS) {
+      return memoryCache.token;
+    }
+    if (memoryCache && now >= memoryCache.expiresAt) {
+      memoryCache = null;
     }
 
-    return fetchHantuToken();
+    // 2) DB에서 조회
+    const fromDb = await getTokenFromDb(now);
+    if (fromDb) {
+      memoryCache = {
+        token: fromDb,
+        expiresAt: now + fromDb.expires_in * 1000,
+      };
+      return fromDb;
+    }
+
+    // 3) 최초 또는 만료 임박
+    try {
+      return await fetchAndSaveToken();
+    } catch (e) {
+      wrapTokenFetchError(e);
+    }
   },
 );
 
 /**
  * 토큰으로 API 호출 실행.
- * EGW00123(토큰 만료) 시 즉시 토큰 재발급하지 않고 캐시만 비운 뒤 안내 throw.
- * (1분당 1회 제한 회피, 다음 새로고침 시 새 토큰 1회만 발급)
+ * EGW00123(토큰 만료) 시 캐시만 비우고 throw (다음 요청에서 1회만 재발급).
  */
 export async function withHantuToken<T>(
   fn: (accessToken: string) => Promise<T>,
@@ -131,7 +180,7 @@ export async function withHantuToken<T>(
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes(HANTU_TOKEN_EXPIRED_CODE)) {
-      clearHantuTokenCache();
+      await clearHantuTokenCache();
       console.error(err);
     }
     throw err;
