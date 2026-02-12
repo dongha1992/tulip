@@ -33,7 +33,7 @@ export const getShortInterest = cache(
     const exchange = mapExcdToExchangeSlug(excd);
     const symbol = `${exchange}-${symb.toLowerCase()}`;
 
-    const res = await fetch(`http://localhost:3000/api/short-interest`, {
+    const res = await fetch('/api/short-interest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ symbol }),

@@ -30,61 +30,76 @@ async def get_stock_feeds(stock_id: str, max_scrolls: int = 5) -> List[Dict]:
                 "--mute-audio",
             ],
         )
-        try:
-            page = await browser.new_page()
-            await page.goto(url, wait_until='domcontentloaded', timeout=60000)
 
-            # stock-contents-root > section > div(contain: size, overflow-anchor) 대기
-            container_sel = '#stock-contents-root section div[style*="overflow-anchor: none"][style*="flex: 0 0 auto"]'
-            await page.wait_for_selector(container_sel, state='attached', timeout=15000)
+        context = await browser.new_context(
+            locale="ko-KR",
+            timezone_id="Asia/Seoul",
+            viewport={"width": 1280, "height": 900},
+            user_agent=(
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/122.0.0.0 Safari/537.36"
+            ),
+        )
 
-            stock_feeds = []
-            seen_keys = set()
-            scroll_count = 0
+        page = await browser.new_page()
+        await page.goto(url, wait_until='domcontentloaded', timeout=60000)
 
-            while scroll_count < max_scrolls:
-                await page.keyboard.press('End')
-                await asyncio.sleep(2)
+        post_locator = page.locator('[data-section-name="커뮤니티__게시글"]')
+        await post_locator.first.wait_for(state="visible", timeout=30000)
 
-                container = await page.query_selector(container_sel)
-                if not container:
-                    break
+        stock_feeds: List[Dict] = []
+        seen_ids = set()
 
-                # data-section-name="커뮤니티__게시글" 인 피드 아이템들
-                feeds = await container.query_selector_all('[data-section-name="커뮤니티__게시글"]')
+        last_count = 0
+        for _ in range(max_scrolls):
+            # 현재 화면에 잡히는 포스트들
+            posts = await post_locator.element_handles()
 
-                for feed in feeds:
-                    # 본문 텍스트: span (--fold-after-lines, --tds-wts-font-weight: 500, --tds-wts-font-size: 15px)
-                    text_el = await feed.query_selector(
-                        'span[style*="--fold-after-lines"][style*="--tds-wts-font-weight: 500"][style*="--tds-wts-font-size: 15px"]'
-                    )
-                    text = (await text_el.inner_text()).strip() if text_el else ""
+            for post in posts:
+                post_id = await post.get_attribute("data-post-anchor-id")
+                if not post_id or post_id in seen_ids:
+                    continue
 
-                    # 이미지: div[data-contents-code="이미지_미리보기"] img
-                    img_el = await feed.query_selector('div[data-contents-code="이미지_미리보기"] img')
-                    image_src = await img_el.get_attribute('src') if img_el else None
+                text = ""
+                
+                text_el = await post.query_selector("span._1xixuox1")
+                if text_el:
+                    text = (await text_el.inner_text()).strip()
 
-                    # 피드 상세 링크 (있으면)
-                    link_el = await feed.query_selector('a[data-tossinvest-log="Link"][href*="/_ul/"]') or await feed.query_selector('a[data-tossinvest-log="Link"]')
-                    href_value = await link_el.get_attribute('href') if link_el else ""
+                if not text:
+                    raw = (await post.inner_text()).strip()
+                    
+                    text = raw[:2000]
 
-                    key = (text or "")[:80]
-                    if key and key not in seen_keys:
-                        stock_feeds.append({
-                            "href": href_value or "",
-                            "text": text,
-                            "imageSrc": image_src
-                        })
-                        seen_keys.add(key)
+                img_srcs: List[str] = []
+                img_els = await post.query_selector_all('ul[data-list-name="EditorImageList"] img')
+                for img in img_els:
+                    src = await img.get_attribute("src")
+                    if src:
+                        img_srcs.append(src)
 
-                scroll_count += 1
-                if len(feeds) == 0:
-                    break
-            print(f"Crawling successful: {len(stock_feeds)} feeds collected.")
-            return stock_feeds
+                stock_feeds.append({
+                    "postId": post_id,
+                    "text": text,
+                    "imageSrcs": img_srcs,
+                })
+                seen_ids.add(post_id)
 
-        finally:
-            await browser.close()
+            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            await asyncio.sleep(1.8)
+
+            
+            cur_count = len(seen_ids)
+            if cur_count == last_count:
+                break
+            last_count = cur_count
+
+        print(f"Crawling successful: {len(stock_feeds)} posts collected.")
+        await context.close()
+        await browser.close()
+        return stock_feeds
+
 
 
 async def get_borrow_fee_second_row_html(symbol: str) -> dict[str, str] | None:

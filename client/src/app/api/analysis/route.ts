@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     // 1. 크롤링
     const body = { stock_id, max_scrolls: 5, save: true };
 
-    const crawlRes = await fetch(`${CRAWLER_BASE}/crawl`, {
+    const crawlRes = await fetch(`http://127.0.0.1:8080/crawl`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
