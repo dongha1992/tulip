@@ -5,6 +5,8 @@ import { getStocksMetaInfo } from '@/features/stock/queries/get-stocks-meta-info
 import type { OverseasStockBasicInfoResponse } from '@/features/stock/types';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 type StockDetailPageProps = {
   params: Promise<{
     stockCode: string;
