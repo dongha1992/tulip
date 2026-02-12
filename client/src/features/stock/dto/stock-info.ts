@@ -79,9 +79,7 @@ function toFYSeriesFallbackAnnualLike(items: SecFactItem[]): SecFactItem[] {
   return annualLike;
 }
 
-export function buildSummaryDTO(
-  data: CompanyFactsResponse,
-): SummaryDTO | null {
+export function buildSummaryDTO(data: CompanyFactsResponse): SummaryDTO | null {
   const m = computeStyleMetrics(data);
   if (!m) return null;
 

@@ -7,12 +7,14 @@ type SearchInputProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
+  className?: string;
 };
 
 const SearchInput = ({
   value,
   onChange,
   placeholder = '',
+  className,
 }: SearchInputProps) => {
   const handleSearch = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +28,7 @@ const SearchInput = ({
       defaultValue={value}
       onChange={handleSearch}
       placeholder={placeholder}
+      className={className}
     />
   );
 };

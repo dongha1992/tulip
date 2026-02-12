@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StockDetailCard } from '@/features/stock/components/stock-detail-card';
 import { getStockInfo } from '@/features/stock/queries/get-stock-info';
 import { getStocksMetaInfo } from '@/features/stock/queries/get-stocks-meta-info';
@@ -64,16 +65,37 @@ const StockDetailPage = async ({
       : null;
 
   return (
-    <div className="flex-1 flex flex-col items-center">
-      <div className="w-full max-w-[480px] space-y-6">
-        <StockDetailCard
-          meta={meta}
-          price={price}
-          marketCap={marketCap}
-          tickerSymbol={meta.ticker}
-          pdno={pdno}
-          excd={excd ?? null}
-        />
+    <div className="flex-1 flex justify-center">
+      <div className="w-full max-w-5xl px-4 py-4 md:py-6">
+        <div className="flex flex-col gap-6 md:flex-row md:items-start">
+          <div className="flex-1">
+            <StockDetailCard
+              meta={meta}
+              price={price}
+              marketCap={marketCap}
+              tickerSymbol={meta.ticker}
+              pdno={pdno}
+              excd={excd ?? null}
+            />
+          </div>
+
+          <aside className="w-full md:w-[280px] space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm font-semibold">광고</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-xs text-muted-foreground">
+                <p>
+                  추후 파트너사·서비스 추천 영역으로 사용할 수 있는 자리입니다.
+                </p>
+                <p>
+                  예: 브로커 프로모션, 리서치 리포트, 관련 종목 배너 등을 넣을
+                  수 있습니다.
+                </p>
+              </CardContent>
+            </Card>
+          </aside>
+        </div>
       </div>
     </div>
   );

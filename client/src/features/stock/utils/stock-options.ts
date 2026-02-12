@@ -149,8 +149,7 @@ export async function buildOptionsSnapshot(
     return null;
   }
 
-  const spot =
-    (yahoo.price?.regularMarketPrice as number | undefined) ?? null;
+  const spot = (yahoo.price?.regularMarketPrice as number | undefined) ?? null;
   const bucketSize = 1; // 기본 $1 버킷
   const withinPct = 0.3; // 현재가 ±30% 범위
 
@@ -185,5 +184,3 @@ export async function buildOptionsSnapshot(
     maxPain,
   };
 }
-
-

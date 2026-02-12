@@ -1,10 +1,10 @@
 import { QuoteSummaryResult } from 'yahoo-finance2/modules/quoteSummary';
 import type { OwnershipBreakdownDTO } from '../types';
 import {
-    clamp01,
-    normalizePctMaybe,
-    roundShares,
-    safeNum,
+  clamp01,
+  normalizePctMaybe,
+  roundShares,
+  safeNum,
 } from '../utils/stock-ownership';
 
 export function buildOwnershipBreakdownDTO(

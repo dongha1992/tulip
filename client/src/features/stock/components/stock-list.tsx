@@ -1,5 +1,5 @@
-import { StockRankItem } from '@/components/stock-rank-item';
 import { Badge } from '@/components/ui/badge';
+import { StockRankItem } from '@/features/stock/components/stock-rank-item';
 import Image from 'next/image';
 import {
   getPriceChangeInfo,
@@ -64,10 +64,12 @@ const StockList = async ({ searchParams }: StockListProps) => {
     const hasNextPage = start + size < count;
 
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">필터 추가 예정</p>
+      <div className="space-y-4 flex flex-col justify-center items-center w-[560px]">
         <ul className="space-y-4">
-          <StockSearchInput placeholder="검색어를 입력하세요" />
+          <StockSearchInput
+            placeholder="검색어를 입력하세요"
+            className="w-full max-w-screen-[1024px] mx-auto"
+          />
 
           {list.map(({ rankingItem, meta }, i) => (
             <StockRankItem

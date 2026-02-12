@@ -71,6 +71,7 @@ export async function POST(req: Request) {
               total_analyzed: 0,
             },
           },
+          top_keywords: [],
         },
       });
     }
@@ -88,8 +89,12 @@ export async function POST(req: Request) {
     }
 
     const sentimentResponse = await analysisRes.json();
+    const { results: sentimentResultsRaw, top_keywords: topKeywords = [] } =
+      Array.isArray(sentimentResponse)
+        ? { results: sentimentResponse, top_keywords: [] }
+        : sentimentResponse;
 
-    const koreanResults = sentimentResponse.map(
+    const koreanResults = sentimentResultsRaw.map(
       (result: {
         score: number;
         label: string;
@@ -121,6 +126,7 @@ export async function POST(req: Request) {
         overall_sentiment: {
           korean: koreanOverall,
         },
+        top_keywords: topKeywords,
       },
     });
   } catch (error) {

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 function safeNum(x: unknown): number | undefined {
   return typeof x === 'number' && Number.isFinite(x) ? x : undefined;
 }

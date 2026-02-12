@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { StocksMetaInfoResponse } from '@/features/stock/types';
 import Image from 'next/image';
@@ -11,7 +10,8 @@ import { getYahooQuoteSummary } from '../queries/get-yahoo-stock-forecast';
 import type { CompanyFactsResponse, SecCompanyTickerMap } from '../types';
 import type { OptionsSnapshot } from '../utils/stock-options';
 import { buildOptionsSnapshot } from '../utils/stock-options';
-import { FinancialHealthCard } from './financial-health-card';
+import { StockCommunitySentimentSection } from './stock-community-sentiment-section';
+import { FinancialHealthCard } from './stock-financial-health-card';
 import { FuturePerformanceCard } from './stock-future-performance';
 import { StockOptionsCard } from './stock-options-card';
 import { OwnershipCard } from './stock-ownership';
@@ -147,13 +147,16 @@ const StockDetailCard = async ({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* 주가 */}
         {price !== null && !Number.isNaN(price) && (
-          <div className="flex items-baseline gap-2">
-            <p className="text-3xl font-bold">${price.toLocaleString()}</p>
-            <span className="text-sm text-muted-foreground">현재가</span>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-bold">${price.toLocaleString()}</p>
+              <span className="text-sm text-muted-foreground">현재가</span>
+            </div>
           </div>
         )}
+        {/* 커뮤니티 감정 */}
+        <StockCommunitySentimentSection stockId={meta.stockCode} />
 
         {/* 시가총액 */}
         {marketCap !== null && !Number.isNaN(marketCap) && (
@@ -251,19 +254,6 @@ const StockDetailCard = async ({
           putWalls={optionsSnapshot?.putWalls ?? []}
           maxPain={optionsSnapshot?.maxPain ?? null}
         />
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-[20px] font-semibold">
-              커뮤니티 감정 상태
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3">
-              <Badge variant="destructive">극단적 부정</Badge>
-            </div>
-          </CardContent>
-        </Card>
-
         <StockShortInterestCard
           excd={excd}
           symb={pdno ?? meta.ticker}

@@ -5,9 +5,13 @@ import { searchParser } from '../search-params';
 
 type StockSearchInputProps = {
   placeholder: string;
+  className?: string;
 };
 
-const StockSearchInput = ({ placeholder }: StockSearchInputProps) => {
+const StockSearchInput = ({
+  placeholder,
+  className,
+}: StockSearchInputProps) => {
   const [search, setSearch] = useQueryState('search', searchParser);
 
   return (
@@ -15,6 +19,7 @@ const StockSearchInput = ({ placeholder }: StockSearchInputProps) => {
       value={search}
       onChange={setSearch}
       placeholder={placeholder}
+      className={className}
     />
   );
 };

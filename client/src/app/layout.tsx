@@ -45,7 +45,7 @@ export default function RootLayout({
               <Header />
               <div className="flex">
                 <Sidebar />
-                <main className="flex flex-1 flex-col py-24 px-8 bg-secondary/20">
+                <main className="flex flex-1 flex-col py-24 px-8 bg-gray/20">
                   {children}
                 </main>
               </div>
