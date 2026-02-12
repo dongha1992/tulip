@@ -3,6 +3,7 @@
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { createFetcher } from '@/lib/fetcher';
 import { useCallback, useRef, useState } from 'react';
 
@@ -44,11 +45,18 @@ type StockCommunitySentimentSectionProps = {
 export function StockCommunitySentimentSection({
   stockId,
 }: StockCommunitySentimentSectionProps) {
+  const { user } = useAuth();
   const [result, setResult] = useState<AnalyzeResponse['data'] | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const analyzingRef = useRef(false);
 
   const handleAnalyze = useCallback(async () => {
+    if (!user) {
+      // 로그인하지 않은 경우: API 호출 대신 안내만
+      window.alert('로그인 후 감정 분석을 사용할 수 있습니다.');
+      return;
+    }
+
     if (analyzingRef.current) return;
     analyzingRef.current = true;
     setAnalyzing(true);
@@ -63,7 +71,7 @@ export function StockCommunitySentimentSection({
       analyzingRef.current = false;
       setAnalyzing(false);
     }
-  }, [stockId]);
+  }, [stockId, user]);
 
   const korean = result?.overall_sentiment?.korean;
   const topKeywords = result?.top_keywords ?? [];
@@ -90,7 +98,7 @@ export function StockCommunitySentimentSection({
         <CardContent>
           {!result ? (
             <p className="text-sm text-muted-foreground">
-              &apos;감정분석&apos; 버튼을 눌러 커뮤니티 기반 감정을 불러오세요.
+              감정 분석 버튼을 눌러 커뮤니티 기반 감정을 불러오세요.
             </p>
           ) : korean ? (
             <div className="space-y-3">
@@ -104,8 +112,8 @@ export function StockCommunitySentimentSection({
                   {korean.dominant_sentiment}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
-                  평균 점수 {korean.average_score} · {korean.sentiment_strength}{' '}
-                  · {korean.total_analyzed}건 분석
+                  평균 점수 {korean.average_score} ·{' '}
+                  {korean.sentiment_strength}{' '}
                 </span>
               </div>
               {korean.sentiment_distribution.length > 0 && (

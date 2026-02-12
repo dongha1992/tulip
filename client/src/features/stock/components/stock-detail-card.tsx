@@ -158,16 +158,6 @@ const StockDetailCard = async ({
         {/* 커뮤니티 감정 */}
         <StockCommunitySentimentSection stockId={meta.stockCode} />
 
-        {/* 시가총액 */}
-        {marketCap !== null && !Number.isNaN(marketCap) && (
-          <div className="text-sm text-muted-foreground">
-            시가총액{' '}
-            <span className="font-semibold text-foreground">
-              {formatUsd(marketCap)}
-            </span>
-          </div>
-        )}
-
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-[20px] font-semibold">
@@ -183,6 +173,12 @@ const StockDetailCard = async ({
                       ? `기준일 ${dto.recentUpdateEnd}`
                       : '기준일 정보 없음'}
                   </p>
+                </div>
+                <div className="rounded-md bg-muted/40 p-2">
+                  <p className="text-[14px] text-muted-foreground mb-1">
+                    시가총액
+                  </p>
+                  <p className="font-semibold">{formatUsd(marketCap)}</p>
                 </div>
                 <div className="rounded-md bg-muted/40 p-2">
                   <p className="text-[14px] text-muted-foreground mb-1">
@@ -224,7 +220,7 @@ const StockDetailCard = async ({
                   <p className="font-semibold">{dto.netIncomeCagr5yPct}</p>
                 </div>
 
-                <div className="rounded-md bg-muted/40 p-2 col-span-2">
+                <div className="rounded-md bg-muted/40 p-2">
                   <p className="text-[14px] text-muted-foreground mb-1">
                     EPS CAGR (5Y)
                   </p>

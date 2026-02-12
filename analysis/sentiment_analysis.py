@@ -1,23 +1,87 @@
 import re
 from collections import Counter
 
-import torch
-import torch.nn.functional as F
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-
-# 키워드 추출 시 제외할 조사·흔한 단어 (의미 있는 키워드만 남기기 위함)
+# 키워드 추출 시 제외할 조사·대명사·흔한 단어 (의미 있는 키워드만 남기기 위함)
 STOPWORDS = {
-    "은", "는", "이", "가", "을", "를", "의", "에", "와", "과", "도", "만", "에서",
-    "으로", "로", "한", "하다", "있다", "되다", "그", "이", "저", "그것", "이것",
-    "저것", "무엇", "어떤", "어디", "언제", "왜", "how", "the", "a", "an", "is",
-    "are", "was", "were", "to", "of", "in", "on", "for", "and", "or", "but",
+    # 조사·어미
+    "은",
+    "는",
+    "이",
+    "가",
+    "을",
+    "를",
+    "의",
+    "에",
+    "와",
+    "과",
+    "도",
+    "만",
+    "에서",
+    "으로",
+    "로",
+    "한",
+    "하다",
+    "있다",
+    "되다",
+    # 대명사·지시어·부사 등 (의미 약한 단어)
+    "그",
+    "이",
+    "저",
+    "그것",
+    "이것",
+    "저것",
+    "나",
+    "너",
+    "우리",
+    "우린",
+    "너네",
+    "너희",
+    "나도",
+    "너도",
+    "너나",
+    "자꾸",
+    "그냥",
+    "진짜",
+    "정말",
+    "너무",
+    "완전",
+    "좀",
+    "뭐야",
+    "뭐지",
+    "그럼",
+    "이제",
+    "다시",
+    "항상",
+    "맨날",
+    # 영어 불용어
+    "무엇",
+    "어떤",
+    "어디",
+    "언제",
+    "왜",
+    "how",
+    "the",
+    "a",
+    "an",
+    "is",
+    "are",
+    "was",
+    "were",
+    "to",
+    "of",
+    "in",
+    "on",
+    "for",
+    "and",
+    "or",
+    "but",
 }
 
 
 class SentimentAnalyzer:
     def __init__(self):
-        # 감정 사전 정의
+        # 감정 사전 정의 (가볍고 빠른 룰 기반 분석에 사용)
         self.EMOTION_DICT = {
             'positive': [
                 '감사','담는다','업','회복', '불장','매수', '👍🏻', '호재', '와', '쏜다', '쏴라',
@@ -53,14 +117,6 @@ class SentimentAnalyzer:
             4: "긍정"
         }
 
-        # 모델 초기화
-        self.tokenizer = AutoTokenizer.from_pretrained("beomi/kcbert-base", local_files_only=True)
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            "beomi/kcbert-base",
-            num_labels=5,
-            local_files_only=True
-        )
-
     def preprocess_text(self, text):
         text = text.lower()
         text = re.sub(r'\s+', ' ', text)
@@ -74,40 +130,64 @@ class SentimentAnalyzer:
         has_swear = any(em in text for em in self.EMOTION_DICT['swear_words'])
         return has_positive, has_negative, has_very_negative, has_swear
 
+    def _score_with_rules(self, text: str) -> float:
+        """
+        BERT 대신 가벼운 룰 기반 점수 계산.
+        - 기본 50점에서 시작
+        - positive / negative / very_negative / swear_words 사전 기반 가중치 부여
+        """
+        has_positive, has_negative, has_very_negative, has_swear = self.extract_emotion_features(
+            text
+        )
+
+        score = 50.0
+
+        # 욕설이 있으면 강한 부정
+        if has_swear:
+            score = 5.0
+        else:
+            if has_positive:
+                score += 20
+            if has_negative:
+                score -= 20
+            if has_very_negative:
+                score -= 35
+
+            # 강한 긍정 표현 보정
+            if has_positive:
+                if "!!" in text or "!!!!" in text:
+                    score += 10
+                if "👍🏻" in text:
+                    score += 5
+
+        # 0~100 범위로 클램프
+        return max(0.0, min(100.0, score))
+
+    def _class_probabilities_from_score(self, base_score: float) -> dict:
+        """
+        단일 점수에서 5개 클래스 확률을 대략적으로 생성.
+        중앙(50)을 기준으로 양/음수 쪽으로 기울어지게 분포 생성.
+        """
+        # 점수를 0~4 구간으로 매핑
+        target_idx = base_score / 25.0  # 0~4
+        weights = []
+        for i in range(5):
+            # 거리가 멀수록 가중치 감소 (선형)
+            dist = abs(target_idx - i)
+            w = max(0.0, 1.5 - dist)  # 0~1.5
+            weights.append(w)
+
+        total = sum(weights) or 1.0
+        probs = [w / total for w in weights]
+
+        return {
+            self.LABEL_MAPPING[i]: round(p * 100, 2)
+            for i, p in enumerate(probs)
+        }
+
     def analyze_text(self, text):
         try:
-            emotion_features = self.extract_emotion_features(text)
-            has_positive, has_negative, has_very_negative, has_swear = emotion_features
-
-            inputs = self.tokenizer(
-                text,
-                return_tensors="pt",
-                truncation=True,
-                max_length=300,
-                padding="max_length"
-            )
-
-            with torch.no_grad():
-                outputs = self.model(**inputs)
-
-            probabilities = F.softmax(outputs.logits, dim=-1)
-            scores = probabilities[0].tolist()
-            base_score = sum([score * (i * 25) for i, score in enumerate(scores)])
-
-            # 점수 조정
-            if has_swear:
-                base_score = 0
-            elif has_positive:
-                base_score = min(100, base_score + 40)
-                if '!!' in text or '!!!!' in text:
-                    base_score = max(90, base_score)
-                if '👍🏻' in text:
-                    base_score = min(100, base_score + 10)
-
-            if has_very_negative:
-                base_score = max(0, base_score - 60)
-            elif has_negative:
-                base_score = max(0, base_score - 40)
+            base_score = self._score_with_rules(text)
 
             # 감정 분류
             if base_score >= 75:
@@ -121,14 +201,13 @@ class SentimentAnalyzer:
             else:
                 sentiment = "부정"
 
+            class_probs = self._class_probabilities_from_score(base_score)
+
             return {
                 'score': base_score,
                 'label': sentiment,
                 'confidence': "높음" if abs(base_score - 50) > 20 else "중간",
-                'class_probabilities': {
-                    self.LABEL_MAPPING[i]: round(score * 100, 2)
-                    for i, score in enumerate(scores)
-                }
+                'class_probabilities': class_probs,
             }
 
         except Exception as e:
