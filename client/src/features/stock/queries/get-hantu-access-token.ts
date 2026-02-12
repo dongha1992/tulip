@@ -18,27 +18,24 @@ const TOKEN_PATH = '/oauth2/tokenP';
 
 /** 한투 API 키가 설정돼 있는지  */
 export function hasHantuConfig(): boolean {
-  const appkey = process.env.HANTU_APP_KEY ?? process.env.HANTU_API_KEY;
-  const appsecret =
-    process.env.HANTU_APP_SECRET ?? process.env.HANTU_SECRET_KEY;
+  const appkey = process.env.NEXT_PUBLIC_HANTU_APP_KEY;
+  const appsecret = process.env.NEXT_PUBLIC_HANTU_SECRET_KEY;
   return Boolean(appkey && appsecret);
 }
 
 function getHantuBaseUrl(): string {
   const url =
-    process.env.HANTU_BASE_URL ?? 'https://openapi.koreainvestment.com:9443';
+    process.env.NEXT_PUBLIC_HANTU_BASE_URL ??
+    'https://openapi.koreainvestment.com:9443';
   return url.replace(/\/$/, '');
 }
 
 function getTokenBody(): HantuTokenRequest {
-  const appkey = process.env.HANTU_APP_KEY ?? process.env.HANTU_API_KEY;
-  const appsecret =
-    process.env.HANTU_APP_SECRET ?? process.env.HANTU_SECRET_KEY;
+  const appkey = process.env.NEXT_PUBLIC_HANTU_APP_KEY;
+  const appsecret = process.env.NEXT_PUBLIC_HANTU_SECRET_KEY;
 
   if (!appkey || !appsecret) {
-    throw new Error(
-      'HANTU_APP_KEY(또는 HANTU_API_KEY), HANTU_APP_SECRET(또는 HANTU_SECRET_KEY)가 필요합니다.',
-    );
+    throw new Error('HANTU_APP_KEY, HANTU_APP_SECRET가 필요합니다.');
   }
 
   return {
