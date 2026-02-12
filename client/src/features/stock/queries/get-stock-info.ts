@@ -1,7 +1,4 @@
-import {
-  hasHantuConfig,
-  withHantuToken,
-} from '@/features/stock/queries/get-hantu-access-token';
+import { withHantuToken } from '@/features/stock/queries/get-hantu-access-token';
 import type {
   OverseasStockBasicInfoQuery,
   OverseasStockBasicInfoResponse,
@@ -15,14 +12,13 @@ const OVERSEAS_STOCK_BASIC_INFO_PATH =
 
 function getHantuBaseUrl(): string {
   const url =
-    process.env.NEXT_PUBLIC_HANTU_BASE_URL ??
-    'https://openapi.koreainvestment.com:9443';
+    process.env.HANTU_BASE_URL ?? 'https://openapi.koreainvestment.com:9443';
   return url.replace(/\/$/, '');
 }
 
 function getHantuHeaders(): Record<string, string> {
-  const appkey = process.env.NEXT_PUBLIC_HANTU_APP_KEY;
-  const appsecret = process.env.NEXT_PUBLIC_HANTU_SECRET_KEY;
+  const appkey = process.env.HANTU_APP_KEY;
+  const appsecret = process.env.HANTU_SECRET_KEY;
 
   if (!appkey || !appsecret) {
     throw new Error('HANTU_APP_KEY, HANTU_APP_SECRET가 필요합니다.');
@@ -57,9 +53,9 @@ export const getStockInfo = cache(
   async (
     options: GetStockInfoOptions,
   ): Promise<OverseasStockBasicInfoResponse | null> => {
-    if (!hasHantuConfig()) {
-      return null;
-    }
+    // if (!hasHantuConfig()) {
+    //   return null;
+    // }
 
     const data = await withHantuToken((access_token) =>
       hantuFetcher.get<OverseasStockBasicInfoResponse>(

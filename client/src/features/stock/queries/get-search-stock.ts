@@ -1,7 +1,4 @@
-import {
-  hasHantuConfig,
-  withHantuToken,
-} from '@/features/stock/queries/get-hantu-access-token';
+import { withHantuToken } from '@/features/stock/queries/get-hantu-access-token';
 import { createFetcher } from '@/lib/fetcher';
 import { cache } from 'react';
 
@@ -11,14 +8,13 @@ const OVERSEAS_PRICE_DETAIL_PATH =
 
 function getHantuBaseUrl(): string {
   const url =
-    process.env.NEXT_PUBLIC_HANTU_BASE_URL ??
-    'https://openapi.koreainvestment.com:9443';
+    process.env.HANTU_BASE_URL ?? 'https://openapi.koreainvestment.com:9443';
   return url.replace(/\/$/, '');
 }
 
 function getHantuHeaders(): Record<string, string> {
-  const appkey = process.env.NEXT_PUBLIC_HANTU_APP_KEY;
-  const appsecret = process.env.NEXT_PUBLIC_HANTU_SECRET_KEY;
+  const appkey = process.env.HANTU_APP_KEY;
+  const appsecret = process.env.HANTU_SECRET_KEY;
 
   if (!appkey || !appsecret) {
     throw new Error('HANTU_APP_KEY, HANTU_APP_SECRET가 필요합니다.');
@@ -108,64 +104,64 @@ const hantuFetcher = createFetcher({
   defaultHeaders: { 'content-type': 'application/json; charset=utf-8' },
 });
 
-function emptyPriceDetailResponse(): OverseasPriceDetailResponse {
-  return {
-    rt_cd: '0',
-    msg_cd: '',
-    msg1: '',
-    output: {
-      rsym: '',
-      pvol: '',
-      open: '',
-      high: '',
-      low: '',
-      last: '',
-      base: '',
-      tomv: '',
-      pamt: '',
-      uplp: '',
-      dnlp: '',
-      h52p: '',
-      h52d: '',
-      l52p: '',
-      l52d: '',
-      perx: '',
-      pbrx: '',
-      epsx: '',
-      bpsx: '',
-      shar: '',
-      mcap: '',
-      curr: '',
-      zdiv: '',
-      vnit: '',
-      t_xprc: '',
-      t_xdif: '',
-      t_xrat: '',
-      p_xprc: '',
-      p_xdif: '',
-      p_xrat: '',
-      t_rate: '',
-      p_rate: '',
-      t_xsgn: '',
-      p_xsng: '',
-      e_ordyn: '',
-      e_hogau: '',
-      e_icod: '',
-      e_parp: '',
-      tvol: '',
-      tamt: '',
-      etyp_nm: '',
-    },
-  };
-}
+// function emptyPriceDetailResponse(): OverseasPriceDetailResponse {
+//   return {
+//     rt_cd: '0',
+//     msg_cd: '',
+//     msg1: '',
+//     output: {
+//       rsym: '',
+//       pvol: '',
+//       open: '',
+//       high: '',
+//       low: '',
+//       last: '',
+//       base: '',
+//       tomv: '',
+//       pamt: '',
+//       uplp: '',
+//       dnlp: '',
+//       h52p: '',
+//       h52d: '',
+//       l52p: '',
+//       l52d: '',
+//       perx: '',
+//       pbrx: '',
+//       epsx: '',
+//       bpsx: '',
+//       shar: '',
+//       mcap: '',
+//       curr: '',
+//       zdiv: '',
+//       vnit: '',
+//       t_xprc: '',
+//       t_xdif: '',
+//       t_xrat: '',
+//       p_xprc: '',
+//       p_xdif: '',
+//       p_xrat: '',
+//       t_rate: '',
+//       p_rate: '',
+//       t_xsgn: '',
+//       p_xsng: '',
+//       e_ordyn: '',
+//       e_hogau: '',
+//       e_icod: '',
+//       e_parp: '',
+//       tvol: '',
+//       tamt: '',
+//       etyp_nm: '',
+//     },
+//   };
+// }
 
 export const getSearchStock = cache(
   async (
     options: GetSearchStockOptions,
   ): Promise<OverseasPriceDetailResponse> => {
-    if (!hasHantuConfig()) {
-      return emptyPriceDetailResponse();
-    }
+    // if (!hasHantuConfig()) {
+    //   return emptyPriceDetailResponse();
+    // }
 
     const data = await withHantuToken((access_token) =>
       hantuFetcher.get<OverseasPriceDetailResponse>(

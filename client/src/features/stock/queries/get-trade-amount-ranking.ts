@@ -1,7 +1,4 @@
-import {
-  hasHantuConfig,
-  withHantuToken,
-} from '@/features/stock/queries/get-hantu-access-token';
+import { withHantuToken } from '@/features/stock/queries/get-hantu-access-token';
 import type {
   TradeAmountRankingQuery,
   TradeAmountRankingResponse,
@@ -12,24 +9,23 @@ import { cache } from 'react';
 const TR_ID = 'HHDFS76320010';
 const TRADE_AMOUNT_RANKING_PATH = '/uapi/overseas-stock/v1/ranking/trade-pbmn';
 
-const EMPTY_RANKING: TradeAmountRankingResponse = {
-  rt_cd: '0',
-  msg_cd: '',
-  msg1: '',
-  output1: { zdiv: '', stat: '', crec: '', trec: '', nrec: '' },
-  output2: [],
-};
+// const EMPTY_RANKING: TradeAmountRankingResponse = {
+//   rt_cd: '0',
+//   msg_cd: '',
+//   msg1: '',
+//   output1: { zdiv: '', stat: '', crec: '', trec: '', nrec: '' },
+//   output2: [],
+// };
 
 function getHantuBaseUrl(): string {
   const url =
-    process.env.NEXT_PUBLIC_HANTU_BASE_URL ??
-    'https://openapi.koreainvestment.com:9443';
+    process.env.HANTU_BASE_URL ?? 'https://openapi.koreainvestment.com:9443';
   return url.replace(/\/$/, '');
 }
 
 function getHantuHeaders(): Record<string, string> {
-  const appkey = process.env.NEXT_PUBLIC_HANTU_APP_KEY;
-  const appsecret = process.env.NEXT_PUBLIC_HANTU_SECRET_KEY;
+  const appkey = process.env.HANTU_APP_KEY;
+  const appsecret = process.env.HANTU_SECRET_KEY;
 
   if (!appkey || !appsecret) {
     throw new Error('HANTU_APP_KEY, HANTU_APP_SECRET가 필요합니다.');
@@ -69,9 +65,9 @@ export const getTradeAmountRanking = cache(
   async (
     options: GetTradeAmountRankingOptions = {},
   ): Promise<TradeAmountRankingResponse> => {
-    if (!hasHantuConfig()) {
-      return EMPTY_RANKING;
-    }
+    // if (!hasHantuConfig()) {
+    //   return EMPTY_RANKING;
+    // }
 
     const data = await withHantuToken((access_token) =>
       hantuFetcher.get<TradeAmountRankingResponse>(TRADE_AMOUNT_RANKING_PATH, {
