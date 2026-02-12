@@ -169,6 +169,10 @@ async def get_borrow_fee_second_row_html(symbol: str) -> dict[str, str] | None:
 
 def save_to_db(stock_id: str, feeds: List[Dict]) -> None:
     if not DATABASE_URL:
+        print(
+            "[crawler] DATABASE_URL not set — stock feeds not saved to DB. "
+            "Set DATABASE_URL in crawler/.env (or env) to persist feeds."
+        )
         return
 
     conn = psycopg2.connect(DATABASE_URL)
